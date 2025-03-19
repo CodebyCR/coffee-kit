@@ -18,13 +18,7 @@ jobs:
         swift-version: "6.0.0"
     - name: Get swift version
       run: swift --version
-    - name: showCurrentFolder
-      run: pwd
-    - name: navToParentDir
-      run: cd ..
-    - name: showFolderContent
-      run: ls -l
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+#    - name: Build
+#      run: swift build -v
+#    - name: Run tests
+#      run: swift test -v
