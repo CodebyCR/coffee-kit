@@ -10,7 +10,7 @@ on:
 jobs:
   build_and_test:
 
-    runs-on: ubuntu-24.04
+    runs-on: ["macos-latest"]
     permissions:
       contents: write
     steps:
