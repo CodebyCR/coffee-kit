@@ -44,10 +44,6 @@ public extension Order {
         self.paymentOption = paymentOption.rawValue
         paymentStatus = "pending"
         items = orderdProducts
-
-        let rawDate = 763811237.81686
-        let date = Date(timeIntervalSince1970: rawDate)
-        print("Date: \(date)")
     }
 }
 

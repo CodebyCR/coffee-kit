@@ -7,24 +7,19 @@
 
 import Foundation
 
-@Observable
 @MainActor
-public final class MenuManager {
+public final class MenuManager: ObservableObject {
     // MARK: - Properties
 
-    @ObservationIgnored private var webservice: WebserviceProvider
+    private var webservice: WebserviceProvider
 
-    public var items: [Product] = []
+    @Published public var items: [Product] = []
 
     // MARK: - Computed Properties
 
     public var itemSequence: CoffeeService {
         return CoffeeService(databaseAPI: webservice.databaseAPI)
     }
-
-//    public var cakeService: CakeService {
-//        return CakeService(databaseAPI: webservice.databaseAPI)
-//    }
 
     // MARK: - Initializer
 
