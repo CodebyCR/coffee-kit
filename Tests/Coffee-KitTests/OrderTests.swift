@@ -7,10 +7,10 @@
 
 @testable import Coffee_Kit
 import Foundation
-import Testing
+import XCTest
 
-struct OrderTests {
-    @Test func testTakingOrder() async {
+final class OrderTests: XCTestCase {
+    fileprivate func testTakingOrder() async {
         let databaseAPI = DatabaseAPI.dev
         let webservice = await WebserviceProvider(inMode: databaseAPI)
         let orderManager = await OrderManager(from: webservice)

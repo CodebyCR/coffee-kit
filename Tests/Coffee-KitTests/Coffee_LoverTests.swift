@@ -7,10 +7,10 @@
 
 @testable import Coffee_Kit
 import Foundation
-import Testing
+import XCTest
 
-struct Coffee_LoverTests {
-    @Test func decodingCoffeTest() async throws {
+final class Coffee_LoverTests: XCTestCase {
+    fileprivate func decodingCoffeTest() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
 
         let ressource = """
@@ -33,6 +33,6 @@ struct Coffee_LoverTests {
         let data = Data(ressource.utf8)
         let product = try JSONDecoder().decode(Product.self, from: data)
 
-        #expect(product.id.uuidString == "e074867a-0c6a-49ff-87ca-b1ba5dae5236".uppercased())
+        XCTAssertEqual(product.id.uuidString, "e074867a-0c6a-49ff-87ca-b1ba5dae5236".uppercased())
     }
 }
