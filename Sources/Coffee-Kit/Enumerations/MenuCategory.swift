@@ -29,7 +29,7 @@ public extension MenuCategory {
 // MARK: - Identifiable
 
 extension MenuCategory: Identifiable {
-    public var id: String { self }
+    public var id: Self { self }
 }
 
 // MARK: - Sendable
