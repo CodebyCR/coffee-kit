@@ -1,0 +1,41 @@
+name: Increment Minor Tag
+
+on:
+  push:
+    branches:
+      - "main" 
+
+jobs:
+  bump-minor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || echo "v0.0.0")
+          echo "Latest tag: $latest_tag"
+          echo "tag=$latest_tag" >> $GITHUB_ENV
+
+      - name: Increment minor version
+        id: bump_version
+        run: |
+          tag=${{ env.tag }}
+          major=$(echo $tag | cut -d. -f1 | tr -d 'v')
+          minor=$(echo $tag | cut -d. -f2)
+          patch=$(echo $tag | cut -d. -f3)
+          new_minor=$((minor + 1))
+          new_tag="v${major}.${new_minor}.0"
+          echo "New tag: $new_tag"
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+
+      - name: Push new tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}
