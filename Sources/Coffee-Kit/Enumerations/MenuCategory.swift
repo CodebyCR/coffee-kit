@@ -7,13 +7,11 @@
 
 import Foundation
 
-public enum MenuCategory: String, CaseIterable, Identifiable, Hashable, Codable, Sendable {
+public enum MenuCategory: String, CaseIterable, Hashable, Codable {
     case coffee = "Coffee"
     case cake = "Cake"
     case tea = "Tea"
     case snacks = "Snacks"
-
-    public var id: Self { self }
 }
 
 extension MenuCategory: CustomDebugStringConvertible {
@@ -27,3 +25,13 @@ public extension MenuCategory {
         allCases.first { $0.rawValue == name }
     }
 }
+
+// MARK: - Identifiable
+
+extension MenuCategory: Identifiable {
+    public var id: String { self }
+}
+
+// MARK: - Sendable
+
+extension MenuCategory: Sendable {}
