@@ -8,25 +8,25 @@
 import Foundation
 
 @MainActor
-public struct CoffeeService {
+public struct ProductService {
     // MARK: Properties
 
-    let coffeeURL: URL
+    let productURL: URL
 
     // MARK: Initializer
 
     public init(databaseAPI: DatabaseAPI) {
-        self.coffeeURL = databaseAPI.baseURL / "coffee"
-        print(coffeeURL)
+        self.productURL = databaseAPI.baseURL / "coffee"
+        print(productURL)
     }
 
     // MARK: Methods
 
     public func getIds() async throws -> [String] {
-        let coffeeIdsUrl = coffeeURL / "ids"
-        let (data, response) = try await URLSession.shared.data(from: coffeeIdsUrl)
+        let productIdsUrl = productURL / "ids"
+        let (data, response) = try await URLSession.shared.data(from: productIdsUrl)
 
-        guard let drinkIds = try? JSONDecoder().decode([String].self, from: data) else {
+        guard let productIds = try? JSONDecoder().decode([String].self, from: data) else {
             print(response)
             print("""
             Error in \(#file)
@@ -36,15 +36,15 @@ public struct CoffeeService {
             throw FetchError.decodingError
         }
 
-        return drinkIds
+        return productIds
     }
 
     public func load(by id: consuming String) async throws -> Product {
-        let coffeeByIdUrl = coffeeURL / "id" / id
+        let coffeeByIdUrl = productURL / "id" / id
 
         let (data, response) = try await URLSession.shared.data(from: coffeeByIdUrl)
 
-        guard let coffee = try? JSONDecoder().decode(Product.self, from: data) else {
+        guard let product = try? JSONDecoder().decode(Product.self, from: data) else {
             print(response)
 
             let stacktrace = Thread.callStackSymbols.joined(separator: "\n")
@@ -57,7 +57,7 @@ public struct CoffeeService {
             throw FetchError.decodingError
         }
 
-        return coffee
+        return product
     }
 
     public func load(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
@@ -65,8 +65,8 @@ public struct CoffeeService {
             Task {
                 do {
                     for id in ids {
-                        let coffeeModel = try await load(by: id)
-                        continuation.yield(coffeeModel)
+                        let productModel = try await load(by: id)
+                        continuation.yield(productModel)
                     }
                     continuation.finish()
                 } catch {
