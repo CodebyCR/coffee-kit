@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "CBA25149-CE25-449E-A308-EE7557C98D23",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "Coffee-KitTests",
+        "name" : "Coffee-KitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

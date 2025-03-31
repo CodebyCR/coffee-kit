@@ -10,10 +10,10 @@ import Foundation
 import XCTest
 
 final class OrderTests: XCTestCase {
-    fileprivate func testTakingOrder() async {
+    func testTakingOrder() async {
         let databaseAPI = DatabaseAPI.dev
         let webservice = await WebserviceProvider(inMode: databaseAPI)
-        let orderManager = await OrderManager(from: webservice)
+        _ = await OrderManager(from: webservice)
 //
 //        var products = orderManager.shoppingCard
 //        products.add( CakeModel(), to: "Cakes")
@@ -25,4 +25,6 @@ final class OrderTests: XCTestCase {
 //
 //        await orderManager.takeOrder()
     }
+
+
 }

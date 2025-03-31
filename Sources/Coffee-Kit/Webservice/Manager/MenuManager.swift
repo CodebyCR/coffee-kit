@@ -17,8 +17,8 @@ import Foundation
 
     // MARK: - Computed Properties
 
-    public var itemSequence: CoffeeService {
-        return CoffeeService(databaseAPI: webservice.databaseAPI)
+    public var itemSequence: ProductService {
+        return ProductService(databaseAPI: webservice.databaseAPI)
     }
 
     // MARK: - Initializer
