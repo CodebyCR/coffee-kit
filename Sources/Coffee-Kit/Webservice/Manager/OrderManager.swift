@@ -8,11 +8,11 @@
 import Foundation
 
 @MainActor
-public final class OrderManager: ObservableObject {
-    private var webservice: WebserviceProvider
+@Observable public final class OrderManager {
+    @ObservationIgnored private var webservice: WebserviceProvider
 
-    @Published private(set) var pendingOrders: [Order] = []
-    @Published private(set) var completedOrders: [Order] = []
+    private(set) var pendingOrders: [Order] = []
+    private(set) var completedOrders: [Order] = []
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice

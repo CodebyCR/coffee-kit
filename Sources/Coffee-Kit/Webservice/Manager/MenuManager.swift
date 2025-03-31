@@ -8,12 +8,12 @@
 import Foundation
 
 @MainActor
-public final class MenuManager: ObservableObject {
+@Observable public final class MenuManager {
     // MARK: - Properties
 
-    private var webservice: WebserviceProvider
+    @ObservationIgnored private var webservice: WebserviceProvider
 
-    @Published public var items: [Product] = []
+    public var items: [Product] = []
 
     // MARK: - Computed Properties
 

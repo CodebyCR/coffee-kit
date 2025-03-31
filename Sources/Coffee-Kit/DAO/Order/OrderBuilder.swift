@@ -7,11 +7,11 @@
 
 import Foundation
 
-public class OrderBuilder: ObservableObject {
+@Observable public class OrderBuilder {
     // MARK: - Properties
 
-    private(set) var userId: UUID
-    @Published public var products: [OrderProduct] = []
+    @ObservationIgnored private(set) var userId: UUID
+    public var products: [OrderProduct] = []
 
     public var totalProducts: Int {
         products.reduce(0) { Int($0) + Int($1.quantity) }
