@@ -10,7 +10,7 @@ import Foundation
 import XCTest
 
 final class Coffee_LoverTests: XCTestCase {
-    fileprivate func decodingCoffeTest() async throws {
+    func testDecodingProduct() throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
 
         let ressource = """
@@ -34,5 +34,22 @@ final class Coffee_LoverTests: XCTestCase {
         let product = try JSONDecoder().decode(Product.self, from: data)
 
         XCTAssertEqual(product.id.uuidString, "e074867a-0c6a-49ff-87ca-b1ba5dae5236".uppercased())
+    }
+
+    func testEncodingProduct() {
+        let product = Product()
+        guard let data = try? JSONEncoder().encode(product)
+        else {
+            XCTFail("Encoding failed")
+            return
+        }
+
+        guard let json = String(data: data, encoding: .utf8)
+        else {
+            XCTFail("Decoding failed")
+            return
+        }
+
+        XCTAssertFalse(json.isEmpty)
     }
 }
