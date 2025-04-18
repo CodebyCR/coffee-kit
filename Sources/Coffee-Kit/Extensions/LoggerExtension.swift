@@ -12,6 +12,7 @@ public extension Logger {
         let startTime = Date()
         let duration: TimeInterval
 
+
         do {
             try task()
             duration = Date().timeIntervalSince(startTime)
