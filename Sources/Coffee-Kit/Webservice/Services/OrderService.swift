@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import OSLog
 
 @MainActor
 public struct OrderService {
     // MARK: - Properties
-
+    private let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderService")
     private let orderUrl: URL
 
     // MARK: - Initializer
@@ -29,7 +30,7 @@ public struct OrderService {
         request.httpBody = requestData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        print("Post to \(createOrderURL)")
+        logger.debug("Post to \(createOrderURL)")
 
         let (_, response) = try await URLSession.shared.data(for: request)
 
@@ -39,11 +40,12 @@ public struct OrderService {
             let requestDataJson = String(data: requestData, encoding: .utf8) ?? "nil"
 
             print(requestDataJson)
-            print("""
+            logger.error("""
             Error in \(#file)
             \t\(#function) \(#line):\(#column)
             \tStatus code: \((response as? HTTPURLResponse)?.statusCode ?? 0)
             """)
+
             throw FetchError.invalidResponse
         }
     }
