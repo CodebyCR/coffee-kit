@@ -70,7 +70,7 @@ import Foundation
         let orderItems = products.map { OrderItem(from: $0) }
 
         // Currently fake user id and only cash payment is supported
-        let newOrder = Order(userId: UUID(), orderdProducts: orderItems, paymentOption: .cash)
+        let newOrder = Order(userId: userId, orderdProducts: orderItems, paymentOption: .cash)
         products.removeAll()
 
         return newOrder
