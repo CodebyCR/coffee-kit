@@ -17,27 +17,23 @@ final class OrderTests: XCTestCase {
 
 
     func testTakingOrder() async {
-        logger.trackTask(called: "testTakingOrder") {
-            Task {
-                let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
-                let databaseAPI = DatabaseAPI.dev
-                let webservice =  WebserviceProvider(inMode: databaseAPI)
-                let orderManager = OrderManager(from: webservice)
-                
-                let orderBuilder = OrderBuilder(for: testUserId)
-                orderBuilder.addProduct(Product())
-                orderBuilder.addProduct(Product())
-                
-                guard let newValidOrder = orderBuilder.build() else {
-                    logger.error("Failed to take order")
-                    return
-                }
+        await logger.trackTask(called: "testTakingOrder") {
+            let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
+            let databaseAPI = DatabaseAPI.dev
+            let webservice =  WebserviceProvider(inMode: databaseAPI)
+            let orderManager = OrderManager(from: webservice)
 
-                await MainActor.run {
-                    orderManager.takeOrder(newValidOrder)
-                }
+            let orderBuilder = OrderBuilder(for: testUserId)
+            orderBuilder.addProduct(Product())
+            orderBuilder.addProduct(Product())
 
+            guard let newValidOrder = orderBuilder.build() else {
+                logger.error("Failed to take order")
+                return
             }
+
+            orderManager.takeOrder(newValidOrder)
+
         }
     }
 

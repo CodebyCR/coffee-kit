@@ -8,13 +8,13 @@ import Foundation
 import OSLog
 
 public extension Logger {
-    func trackTask(called name: String, task: () throws -> Void) {
+    func trackTask(called name: String, task: () async throws -> Void) async {
         let startTime = Date()
         let duration: TimeInterval
 
 
         do {
-            try task()
+            try await task()
             duration = Date().timeIntervalSince(startTime)
 
             // split duration into minutes, seconds and milliseconds

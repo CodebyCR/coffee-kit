@@ -17,20 +17,20 @@ public final class LoggerExtensionTests: XCTestCase {
         case exampleThrow
     }
 
-    func testTrackSucessfulTask(){
+    func testTrackSucessfulTask() async{
         let logger = Logger()
 
 
-        logger.trackTask(called: "SuccessTestTask") {
+        await logger.trackTask(called: "SuccessTestTask") {
             Thread.sleep(forTimeInterval: 1)
             XCTAssertTrue(true)
         }
     }
 
-    func testTrackFailedTask(){
+    func testTrackFailedTask() async{
         let logger = Logger()
 
-        logger.trackTask(called: "FailedTestTask") {
+        await logger.trackTask(called: "FailedTestTask") {
             Thread.sleep(forTimeInterval: 1)
             throw TestError.exampleThrow
         }

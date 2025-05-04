@@ -11,6 +11,7 @@ import OSLog
 @MainActor
 public struct OrderService {
     // MARK: - Properties
+
     private let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderService")
     private let orderUrl: URL
 
@@ -48,6 +49,23 @@ public struct OrderService {
 
             throw FetchError.invalidResponse
         }
+    }
+
+    public func getOrder(by id: String) async throws -> Order {
+        let orderByIdUrl = orderUrl / "id/\(id)"
+        let (data, response) = try await URLSession.shared.data(from: orderByIdUrl)
+
+        guard let order = try? JSONDecoder().decode(Order.self, from: data) else {
+            print(response)
+            print("""
+            Error in \(#file)
+            \t\(#function) \(#line):\(#column)
+            \tStatus code: \((response as? HTTPURLResponse)?.statusCode ?? 0)
+            """)
+            throw FetchError.decodingError
+        }
+
+        return order
     }
 
 //    public func create(new order: Order) async throws {
