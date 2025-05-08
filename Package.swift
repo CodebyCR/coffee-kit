@@ -17,6 +17,7 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/perrystreetsoftware/Harmonize.git", from: "0.1.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -31,7 +32,10 @@ let package = Package(
         ),
         .testTarget(
             name: "Coffee-KitTests",
-            dependencies: ["Coffee-Kit"]
+            dependencies: [
+                "Coffee-Kit",
+                .product(name: "Harmonize", package: "Harmonize"),
+            ]
         ),
     ]
 )
