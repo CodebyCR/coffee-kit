@@ -18,7 +18,7 @@ final class MenuManagerTests: XCTestCase {
     func testItemSequence() {
         let itemSequence = menuManager.itemSequence
         XCTAssertNotNil(itemSequence)
-        
+
     }
 
 
