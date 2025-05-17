@@ -27,13 +27,13 @@ final class OrderTests: XCTestCase {
             orderBuilder.addProduct(Product())
             orderBuilder.addProduct(Product())
 
-            guard let newValidOrder = orderBuilder.build() else {
-                logger.error("Failed to take order")
+            do {
+                let newValidOrder = try orderBuilder.build()
+                orderManager.takeOrder(newValidOrder)
+            } catch {
+                logger.error("Failed to build order: \(error.localizedDescription)")
                 return
             }
-
-            orderManager.takeOrder(newValidOrder)
-
         }
     }
 

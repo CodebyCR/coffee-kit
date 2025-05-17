@@ -62,21 +62,6 @@ import Foundation
         products.removeAll { $0.id == product.id }
     }
 
-    @available(*, deprecated, message: "Use 'thowing' methode instead for future safty.")
-    public func build() -> Order? {
-        guard !products.isEmpty else {
-            return nil
-        }
-
-        let orderItems = products.map { OrderItem(from: $0) }
-
-        // Currently fake user id and only cash payment is supported
-        let newOrder = Order(userId: userId, orderdProducts: orderItems, paymentOption: .cash)
-        products.removeAll()
-
-        return newOrder
-    }
-
     public func build() throws -> Order {
         guard !products.isEmpty else {
             throw OrderBuilderError.emptyShopingCart
