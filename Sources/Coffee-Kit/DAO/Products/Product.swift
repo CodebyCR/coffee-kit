@@ -13,6 +13,7 @@ public struct Product {
     public let categoryNumber: UInt16
     public let name: String
     public let price: Float64
+    public let imageName: String
     public let metadata: Metadata
 }
 
@@ -25,6 +26,7 @@ public extension Product {
         categoryNumber = 1
         name = "Caffee"
         price = 3.20
+        imageName = "Mocha.png"
         metadata = Metadata()
     }
 }
@@ -48,6 +50,7 @@ extension Product: CustomDebugStringConvertible {
             categoryNumber=\(categoryNumber),
             name=\(name),
             price=\(price),
+            imageName=\(imageName),
             metadata=\(metadata)
         """
     }
@@ -62,6 +65,7 @@ extension Product: Codable {
         case categoryNumber = "category_number"
         case name
         case price
+        case imageName = "image_name"
         case metadata
 
         enum MetadataKeys: String, CodingKey {
@@ -78,6 +82,7 @@ extension Product: Codable {
         categoryNumber = try container.decode(UInt16.self, forKey: .categoryNumber)
         name = try container.decode(String.self, forKey: .name)
         price = try container.decode(Float64.self, forKey: .price)
+        imageName = try container.decode(String.self, forKey: .imageName)
         metadata = try container.decode(Metadata.self, forKey: .metadata)
     }
 
@@ -86,6 +91,9 @@ extension Product: Codable {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(price, forKey: .price)
+        try container.encode(category, forKey: .category)
+        try container.encode(categoryNumber, forKey: .categoryNumber)
+        try container.encode(imageName, forKey: .imageName)
 
         var metadataContainer = container.nestedContainer(keyedBy: Metadata.CodingKeys.self, forKey: .metadata)
         try metadataContainer.encode(metadata.createdAt, forKey: .createdAt)
