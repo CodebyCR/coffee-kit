@@ -12,6 +12,7 @@ public struct ProductService {
     // MARK: Properties
 
     let productURL: URL
+    private(set) var menuCache = Cache<String, Product>()
 
     // MARK: Initializer
 
@@ -22,7 +23,7 @@ public struct ProductService {
 
     // MARK: Methods
 
-    public func getIds() async throws -> [String] {
+    @Sendable public consuming func getIds() async throws -> [String] {
         let productIdsUrl = productURL / "ids"
         let (data, response) = try await URLSession.shared.data(from: productIdsUrl)
 
@@ -39,8 +40,12 @@ public struct ProductService {
         return productIds
     }
 
-    public func load(by id: consuming String) async throws -> Product {
+    @Sendable public consuming func load(by id: String) async throws -> Product {
         let coffeeByIdUrl = productURL / "id" / id
+
+        if let cachedProduct = await menuCache[id] {
+            return cachedProduct
+        }
 
         let (data, response) = try await URLSession.shared.data(from: coffeeByIdUrl)
 
@@ -57,10 +62,21 @@ public struct ProductService {
             throw FetchError.decodingError
         }
 
+        await menuCache.set(key: id, value: product)
+
         return product
     }
 
-    public func load(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
+    @Sendable public consuming func load(with id: consuming String) async -> Product? {
+        guard let product = try? await load(by: id)
+        else {
+            print(FetchError.decodingError)
+            return nil
+        }
+        return product
+    }
+
+    @Sendable public func load(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
         return AsyncThrowingStream<Product, Error> { continuation in
             Task {
                 do {
@@ -76,7 +92,7 @@ public struct ProductService {
         }
     }
 
-    public func loadAll() async -> AsyncStream<Result<Product, Error>> {
+    @Sendable public func loadAll() async -> AsyncStream<Result<Product, Error>> {
         return AsyncStream<Result<Product, Error>> { continuation in
             Task {
                 do {
@@ -90,6 +106,27 @@ public struct ProductService {
                 }
                 continuation.finish()
             }
+        }
+    }
+
+    public func loadCuncurrently(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
+        return ids.concurrentMap { id in
+            try await load(by: id)
+        }
+    }
+
+    @Sendable public func fillUpCache() async throws {
+        guard let ids = try? await getIds()
+        else {
+            print("Failed to fetch product IDs")
+            throw FetchError.invalidResponse
+        }
+
+        do {
+            try await menuCache.fillUp(by: ids, with: load)
+        } catch {
+            print("Error filling up cache: \(error)")
+            throw FetchError.invalidResponse
         }
     }
 }
