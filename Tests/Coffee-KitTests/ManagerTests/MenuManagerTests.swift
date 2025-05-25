@@ -12,14 +12,10 @@ import XCTest
 
 @MainActor
 final class MenuManagerTests: XCTestCase {
-
     let menuManager = MenuManager(from: WebserviceProvider(inMode: .dev))
 
     func testItemSequence() {
-        let itemSequence = menuManager.itemSequence
+        let itemSequence = menuManager.productService
         XCTAssertNotNil(itemSequence)
-
     }
-
-
 }

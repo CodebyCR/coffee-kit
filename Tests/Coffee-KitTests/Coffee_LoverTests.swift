@@ -20,6 +20,7 @@ final class Coffee_LoverTests: XCTestCase {
             "category_number": 1,
             "name": "Cheesecake",
             "price": 5.4,
+            "image_name":"Cheesecake.png",
             "metadata": {
                 "created_at": "2024-12-27 16:21:15",
                 "updated_at": "2024-12-27 17:45:14",

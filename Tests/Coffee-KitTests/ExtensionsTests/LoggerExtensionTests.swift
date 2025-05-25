@@ -19,7 +19,7 @@ public final class LoggerExtensionTests: XCTestCase {
         let logger = Logger()
 
         await logger.trackTask(called: "SuccessTestTask") {
-            Task.sleep(for: .seconds(1))
+            try await Task.sleep(for: .seconds(1))
             XCTAssertTrue(true)
         }
     }
@@ -28,7 +28,7 @@ public final class LoggerExtensionTests: XCTestCase {
         let logger = Logger()
 
         await logger.trackTask(called: "FailedTestTask") {
-            Task.sleep(for: .seconds(1))
+            try await Task.sleep(for: .seconds(1))
             throw TestError.exampleThrow
         }
     }
