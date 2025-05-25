@@ -6,32 +6,29 @@
 //
 
 @testable import Coffee_Kit
-import OSLog
 import Foundation
+import OSLog
 import XCTest
 
-
 public final class LoggerExtensionTests: XCTestCase {
-
     enum TestError: Error {
         case exampleThrow
     }
 
-    func testTrackSucessfulTask() async{
+    func testTrackSucessfulTask() async {
         let logger = Logger()
 
-
         await logger.trackTask(called: "SuccessTestTask") {
-            Thread.sleep(forTimeInterval: 1)
+            Task.sleep(for: .seconds(1))
             XCTAssertTrue(true)
         }
     }
 
-    func testTrackFailedTask() async{
+    func testTrackFailedTask() async {
         let logger = Logger()
 
         await logger.trackTask(called: "FailedTestTask") {
-            Thread.sleep(forTimeInterval: 1)
+            Task.sleep(for: .seconds(1))
             throw TestError.exampleThrow
         }
     }
