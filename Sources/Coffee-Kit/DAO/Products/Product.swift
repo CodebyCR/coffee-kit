@@ -31,6 +31,15 @@ public extension Product {
     }
 }
 
+// MARK: - Computed properties
+
+public extension Product {
+    var imageUrl: URL? {
+        URL(string: "http://127.0.0.1:8080/test/images/\(self.category)/\(self.imageName)")
+    }
+}
+
+
 // MARK: - Identifiable
 
 extension Product: Identifiable {}
