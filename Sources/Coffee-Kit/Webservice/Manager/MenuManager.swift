@@ -11,13 +11,14 @@ import Foundation
 @Observable public final class MenuManager {
     // MARK: - Properties
 
-    @ObservationIgnored private var webservice: WebserviceProvider
+    @ObservationIgnored
+    private let webservice: WebserviceProvider
 
     public var items: [Product] = []
 
     // MARK: - Computed Properties
 
-    public var itemSequence: ProductService {
+    public var productService: ProductService {
         return ProductService(databaseAPI: webservice.databaseAPI)
     }
 
@@ -34,6 +35,23 @@ import Foundation
     // MARK: - Methods
 
     public func getSelection(for category: MenuCategory) -> [Product] {
-        items.filter { $0.category == category.rawValue.lowercased() }
+        return items.filter { $0.category == category.rawValue.lowercased() }
+    }
+
+//    public func getCachedItems() -> [Product] {
+//        var cachedItems: [Product] = []
+//        Task {
+//            cachedItems.append(contentsOf: await productService.menuCache.values())
+//        }
+//        return cachedItems
+//    }
+
+    @Sendable public func fillUpCache() async {
+        let productService = ProductService(databaseAPI: webservice.databaseAPI)
+        do {
+            try await productService.fillUpCache()
+        } catch {
+            print("Error filling up cache: \(error)")
+        }
     }
 }
