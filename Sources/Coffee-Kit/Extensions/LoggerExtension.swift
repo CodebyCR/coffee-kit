@@ -12,7 +12,6 @@ public extension Logger {
         let startTime = Date()
         let duration: TimeInterval
 
-
         do {
             try await task()
             duration = Date().timeIntervalSince(startTime)
@@ -33,5 +32,13 @@ public extension Logger {
             self.error("Task '\(name)' failed in \(minutes) minutes, \(seconds) seconds and \(milliseconds) milliseconds")
             self.error("Error: \(error.localizedDescription)")
         }
+    }
+
+    func logExecutionTime(_ log: String, block: () async -> Void) async {
+        let start = DispatchTime.now()
+        await block()
+        let end = DispatchTime.now()
+        let diff = Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1000000000
+        print(log, String(format: "%.3f", diff))
     }
 }
