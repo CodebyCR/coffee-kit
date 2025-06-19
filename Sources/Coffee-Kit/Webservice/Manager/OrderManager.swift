@@ -24,7 +24,22 @@ import OSLog
         OrderService(databaseAPI: webservice.databaseAPI)
     }
 
-    public func takeOrder(_ order: Order) {
+    public func takeOrder(from orderBuilder: OrderBuilder) -> Result<String, Error> {
+        logger.info("Ordering...")
+
+        do {
+            let newOrder = try orderBuilder.build()
+            takeOrder(newOrder)
+            return .success("Your order will arrive soon.")
+
+        } catch {
+            logger.error("Order could not be created. \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+
+
+    private func takeOrder(_ order: Order) {
         logger.info("\(order.debugDescription)")
 
         Task {
