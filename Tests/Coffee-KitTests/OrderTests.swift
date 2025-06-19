@@ -12,7 +12,7 @@ import OSLog
 
 @MainActor
 final class OrderTests: XCTestCase {
-    
+
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
 
 
@@ -27,12 +27,16 @@ final class OrderTests: XCTestCase {
             orderBuilder.addProduct(Product())
             orderBuilder.addProduct(Product())
 
-            do {
-                let newValidOrder = try orderBuilder.build()
-                orderManager.takeOrder(newValidOrder)
-            } catch {
-                logger.error("Failed to build order: \(error.localizedDescription)")
-                return
+
+            let result = orderManager.takeOrder(from: orderBuilder)
+
+            switch(result){
+            case .success(let message):
+                print("Order result: \(message)")
+                XCTAssertEqual(message, "Your order will arrive soon.")
+            case .failure(let error):
+                print("Order failed with error: \(error)")
+                XCTAssertNoThrow(error)
             }
         }
     }
@@ -40,17 +44,29 @@ final class OrderTests: XCTestCase {
     func testDecodeOrder() {
         let orderJson = """
         {
-            "user_id": "8BC6A8B8-302F-40BA-B54C-B9722E72BCD4",
-            "payment_option": "Cash",
-            "id": "FBD9F6AF-8844-4598-845F-88148C9691D4",
+            "user_id": "03F35975-AF57-4691-811F-4AB872FDB51B",
             "items": [
                 {
-                    "id": "EA412375-BC6D-4843-94A0-0499F222595D",
-                    "quantity": 2
+                    "id": "01dc289a-4bb0-407c-b5a6-a6a868ab0101",
+                    "quantity": 1
+                },
+                {
+                    "id": "25e604dc-3308-484b-873d-0491d5ad4e9d",
+                    "quantity": 1
+                },
+                {
+                    "id": "e074867a-0c6a-49ff-87ca-b1ba5dae5236",
+                    "quantity": 1
+                },
+                {
+                    "id": "3cfc8e2b-95b1-461c-a84b-21215dee5a7f",
+                    "quantity": 1
                 }
             ],
-            "order_date": 765311164.172788,
             "payment_status": "pending",
+            "order_date": 765311164.172788,
+            "payment_option": "Cash",
+            "id": "611C357B-50B7-4773-9D7A-BB3349975C9D",
             "order_status": "ordered"
         }
         """
@@ -58,6 +74,6 @@ final class OrderTests: XCTestCase {
         let jsonData = orderJson.data(using: .utf8)!
         let order = try! JSONDecoder().decode(Order.self, from: jsonData)
 
-        XCTAssertEqual(order.id, UUID(uuidString: "FBD9F6AF-8844-4598-845F-88148C9691D4"))
+        XCTAssertEqual(order.id, UUID(uuidString: "611C357B-50B7-4773-9D7A-BB3349975C9D"))
     }
 }
