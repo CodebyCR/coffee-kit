@@ -85,4 +85,16 @@ final class CacheTests: XCTestCase {
         print("Cached products: \(count)")
         XCTAssertEqual(count, ids.count, "All products should be cached")
     }
+
+    func testDataCaching() async throws {
+        let imageService = await ImageService(databaseAPI: .dev)
+        let imageCache = await imageService.imageCache
+        let testProduct = Product()
+
+        let data = try await imageService.getImageData(for: testProduct)
+        XCTAssertNotNil(data, "Image data should not be nil")
+
+        let cachedData = await imageCache.get(key: testProduct.imageName)
+        XCTAssertNotNil(cachedData, "Cached image data should not be nil")
+    }
 }

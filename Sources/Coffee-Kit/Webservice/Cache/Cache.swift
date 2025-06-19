@@ -194,7 +194,7 @@ public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
 
     private func maxCacheSizeReached(with valueSize: Int) -> Bool {
         let newMemoryUsage = memoryUsage + valueSize
-        print("New memory usage: \(newMemoryUsage) bytes")
+//        print("New memory usage: \(newMemoryUsage) bytes")
         return newMemoryUsage > memoryLimit
     }
 }
