@@ -11,7 +11,7 @@ public enum MenuCategory: String, CaseIterable, Hashable, Codable {
     case coffee = "Coffee"
     case cake = "Cake"
     case tea = "Tea"
-    case snacks = "Snacks"
+    case snack = "Snack"
 }
 
 extension MenuCategory: CustomDebugStringConvertible {
