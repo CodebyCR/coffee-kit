@@ -11,7 +11,9 @@ import Foundation
     // MARK: - Properties
 
     @ObservationIgnored private(set) var userId: UUID
-    public var products: [OrderProduct] = []
+    public var products: [OrderProduct] = [] // TODO: Should be replaced with a dictionary for smoother ui updates
+
+    // MARK: - Computed Properties
 
     public var totalProducts: Int {
         products.reduce(0) { Int($0) + Int($1.quantity) }
@@ -36,8 +38,27 @@ import Foundation
 
     // MARK: - Methods
 
+    private func triggerUpdate() {
+        // This method is used to trigger an update in the UI
+        let temp = products
+        products = temp
+    }
+
     public func addProduct(_ product: Product, quantity: UInt8) {
         products.append(OrderProduct(product: product, quantity: quantity))
+    }
+
+    public func updateQuantity(of orderProduct: OrderProduct) {
+        guard orderProduct.quantity > 0 else {
+            removeAll(orderProduct.product)
+            return
+        }
+
+        if let currentProduct = products.first(where: { $0.id == orderProduct.id }) {
+            currentProduct.quantity = orderProduct.quantity
+        }
+
+        triggerUpdate()
     }
 
     public func addProduct(_ product: Product) {
@@ -46,6 +67,7 @@ import Foundation
         } else {
             addProduct(product, quantity: 1)
         }
+        triggerUpdate()
     }
 
     public func removeProduct(_ product: Product) {
