@@ -79,18 +79,20 @@ final class OrderTests: XCTestCase {
     }
 
     func testFeatchOrderById() async throws {
-        let orderId = "611C357B-50B7-4773-9D7A-BB3349975C9D"
-        let databaseAPI = DatabaseAPI.dev
-        let webservice = WebserviceProvider(inMode: databaseAPI)
-        let orderService = OrderService(databaseAPI: webservice.databaseAPI)
+        await self.measure{
+            let orderId = "611C357B-50B7-4773-9D7A-BB3349975C9D"
+            let databaseAPI = DatabaseAPI.dev
+            let webservice = WebserviceProvider(inMode: databaseAPI)
+            let orderService = OrderService(databaseAPI: webservice.databaseAPI)
 
+            let order = try? await orderService.getOrder(by: orderId)
+            XCTAssertNotNil(order, "Order should not be nil")
+            XCTAssertEqual(order?.id.uuidString, orderId, "Order ID should match")
+            print("Fetched order: \(order)")
 
-        let order = try? await orderService.getOrder(by: orderId)
-        XCTAssertNotNil(order, "Order should not be nil")
-        XCTAssertEqual(order?.id.uuidString, orderId, "Order ID should match")
-        print("Fetched order: \(order)")
+            let expectedItemsCount = 4
+        }
 
-        let expectedItemsCount = 4
     }
 
 
