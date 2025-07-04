@@ -14,10 +14,16 @@ public struct OrderService {
 
     private let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderService")
     private let orderUrl: URL
+    private let urlSession: URLSession
 
     // MARK: - Initializer
 
     init(databaseAPI: borrowing DatabaseAPI) {
+        let urlSessionConfiguration = URLSessionConfiguration.default
+        urlSessionConfiguration.timeoutIntervalForRequest = 14
+        urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
+
+        self.urlSession = URLSession(configuration: urlSessionConfiguration)
         self.orderUrl = databaseAPI.baseURL / "order"
     }
 
@@ -33,7 +39,7 @@ public struct OrderService {
 
         logger.debug("Post to \(createOrderURL)")
 
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let (_, response) = try await urlSession.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse,
               200 ..< 300 ~= httpResponse.statusCode
@@ -53,7 +59,7 @@ public struct OrderService {
 
     public func getOrder(by id: String) async throws -> Order {
         let orderByIdUrl = orderUrl / "id/\(id)"
-        let (data, response) = try await URLSession.shared.data(from: orderByIdUrl)
+        let (data, response) = try await urlSession.data(from: orderByIdUrl)
 
         guard let order = try? JSONDecoder().decode(Order.self, from: data) else {
             print(response)

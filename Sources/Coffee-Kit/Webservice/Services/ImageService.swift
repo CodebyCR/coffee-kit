@@ -18,8 +18,12 @@ public struct ImageService {
     private(set) var imageCache: Cache<String, Data>
 
     public init(databaseAPI: borrowing DatabaseAPI) {
+        let urlSessionConfiguration = URLSessionConfiguration.default
+        urlSessionConfiguration.timeoutIntervalForRequest = 14
+        urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
+
+        self.urlSession = URLSession(configuration: urlSessionConfiguration)
         self.imageUrl = databaseAPI.baseURL / "images"
-        self.urlSession = URLSession.shared
         self.imageCache = Cache<String, Data>()
     }
 

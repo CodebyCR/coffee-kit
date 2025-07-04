@@ -12,11 +12,17 @@ public struct ProductService {
     // MARK: Properties
 
     let productURL: URL
+    let urlSession: URLSession
     private(set) var menuCache = Cache<String, Product>()
 
     // MARK: Initializer
 
     public init(databaseAPI: DatabaseAPI) {
+        let urlSessionConfiguration = URLSessionConfiguration.default
+//        urlSessionConfiguration.timeoutIntervalForRequest = 14
+//        urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
+        
+        self.urlSession = URLSession(configuration: urlSessionConfiguration)
         self.productURL = databaseAPI.baseURL / "coffee"
         print(productURL)
     }
@@ -25,7 +31,7 @@ public struct ProductService {
 
     @Sendable public consuming func getIds() async throws -> [String] {
         let productIdsUrl = productURL / "ids"
-        let (data, response) = try await URLSession.shared.data(from: productIdsUrl)
+        let (data, response) = try await urlSession.data(from: productIdsUrl)
 
         guard let productIds = try? JSONDecoder().decode([String].self, from: data) else {
             print(response)
@@ -47,7 +53,7 @@ public struct ProductService {
             return cachedProduct
         }
 
-        let (data, response) = try await URLSession.shared.data(from: coffeeByIdUrl)
+        let (data, response) = try await urlSession.data(from: coffeeByIdUrl)
 
         guard let product = try? JSONDecoder().decode(Product.self, from: data) else {
             print(response)
@@ -106,12 +112,6 @@ public struct ProductService {
                 }
                 continuation.finish()
             }
-        }
-    }
-
-    public func loadCuncurrently(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
-        return ids.concurrentMap { id in
-            try await load(by: id)
         }
     }
 
