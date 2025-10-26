@@ -9,4 +9,5 @@ public enum FetchError: Error {
     case decodingError
     case invalidResponse
     case invalidSelfReference
+    case invalidRequest
 }
