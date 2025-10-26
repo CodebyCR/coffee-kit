@@ -38,7 +38,6 @@ import OSLog
         }
     }
 
-
     private func takeOrder(_ order: Order) {
         logger.info("\(order.debugDescription)")
 
@@ -51,5 +50,21 @@ import OSLog
                 logger.error("Error taking order: \(error)")
             }
         }
+    }
+
+    public func getRealTimeOrderStatus(by id: String) throws -> AsyncThrowingStream<URLSessionWebSocketTask.Message, Error> {
+        guard !id.isEmpty else {
+            throw FetchError.invalidRequest
+        }
+
+        guard let orderStatusUrl = URL(string: "\(webservice.databaseAPI.socketURL)/order/status/\(id)") else {
+            throw FetchError.invalidRequest
+        }
+
+        guard let websocketService = try? WebsocketConnection(url: orderStatusUrl) else {
+            throw FetchError.invalidRequest
+        }
+
+        return websocketService.receive()
     }
 }
