@@ -21,7 +21,7 @@ public struct ProductService {
         let urlSessionConfiguration = URLSessionConfiguration.default
 //        urlSessionConfiguration.timeoutIntervalForRequest = 14
 //        urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
-        
+
         self.urlSession = URLSession(configuration: urlSessionConfiguration)
         self.productURL = databaseAPI.baseURL / "coffee"
         print(productURL)
@@ -29,7 +29,7 @@ public struct ProductService {
 
     // MARK: Methods
 
-    @Sendable public consuming func getIds() async throws -> [String] {
+    @Sendable public func getIds() async throws -> [String] {
         let productIdsUrl = productURL / "ids"
         let (data, response) = try await urlSession.data(from: productIdsUrl)
 
@@ -46,8 +46,10 @@ public struct ProductService {
         return productIds
     }
 
-    @Sendable public consuming func load(by id: String) async throws -> Product {
+    @Sendable public func load(by id: String) async throws -> Product {
         let coffeeByIdUrl = productURL / "id" / id
+
+        //print("URL: \(coffeeByIdUrl.absoluteString)")
 
         if let cachedProduct = await menuCache[id] {
             return cachedProduct
@@ -73,7 +75,7 @@ public struct ProductService {
         return product
     }
 
-    @Sendable public consuming func load(with id: consuming String) async -> Product? {
+    @Sendable public func load(with id: consuming String) async -> Product? {
         guard let product = try? await load(by: id)
         else {
             print(FetchError.decodingError)

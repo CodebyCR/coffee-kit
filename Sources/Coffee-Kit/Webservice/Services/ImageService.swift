@@ -23,7 +23,7 @@ public struct ImageService {
         urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
 
         self.urlSession = URLSession(configuration: urlSessionConfiguration)
-        self.imageUrl = databaseAPI.baseURL / "images"
+        self.imageUrl = databaseAPI.baseURL / "Images"
         self.imageCache = Cache<String, Data>()
     }
 
@@ -32,7 +32,7 @@ public struct ImageService {
         guard let httpResponse = responce as? HTTPURLResponse,
               200 ..< 300 ~= httpResponse.statusCode
         else {
-            print("Failed to fetch image data from \(url). Status code: \((responce as? HTTPURLResponse)?.statusCode ?? 0)")
+            print("Failed to fetch image data from '\(url)'. Status code: \((responce as? HTTPURLResponse)?.statusCode ?? 0)")
             throw ImageServiceError.imageNotFound
         }
 
@@ -44,7 +44,7 @@ public struct ImageService {
         return data
     }
 
-    @Sendable public consuming func getImageData(for product: borrowing Product) async throws -> Data {
+    @Sendable public func getImageData(for product: borrowing Product) async throws -> Data {
         if let cachedImage = await imageCache.get(key: product.imageName) {
             return cachedImage
         }
