@@ -35,7 +35,7 @@ final class ProductServiceTests: XCTestCase {
     }
 
     func testFetchProductById() async {
-        let cappuccinoId = "\'01dc289a-4bb0-407c-b5a6-a6a868ab0101\'"
+        let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 
         guard let product = try? await productService
             .load(by: cappuccinoId)

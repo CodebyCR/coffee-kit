@@ -6,31 +6,29 @@
 //
 
 @testable import Coffee_Kit
+import Combine
 import Foundation
-import XCTest
 import OSLog
+import XCTest
 
 @MainActor
 final class OrderTests: XCTestCase {
-
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
-
 
     func testTakingOrder() async {
         await logger.trackTask(called: "testTakingOrder") {
             let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
             let databaseAPI = DatabaseAPI.dev
-            let webservice =  WebserviceProvider(inMode: databaseAPI)
+            let webservice = WebserviceProvider(inMode: databaseAPI)
             let orderManager = OrderManager(from: webservice)
 
             let orderBuilder = OrderBuilder(for: testUserId)
             orderBuilder.addProduct(Product())
             orderBuilder.addProduct(Product())
 
-
             let result = orderManager.takeOrder(from: orderBuilder)
 
-            switch(result){
+            switch result {
             case .success(let message):
                 print("Order result: \(message)")
                 XCTAssertEqual(message, "Your order will arrive soon.")
@@ -78,24 +76,26 @@ final class OrderTests: XCTestCase {
         XCTAssertEqual(order.id, UUID(uuidString: "611C357B-50B7-4773-9D7A-BB3349975C9D"))
     }
 
-    func testFeatchOrderById() async throws {
-        await self.measure{
-            let orderId = "611C357B-50B7-4773-9D7A-BB3349975C9D"
-            let databaseAPI = DatabaseAPI.dev
-            let webservice = WebserviceProvider(inMode: databaseAPI)
-            let orderService = OrderService(databaseAPI: webservice.databaseAPI)
+    func testFetchOrderById() async throws {
+        let orderId = "059621D5-C191-45A9-AB5B-B4B414E9DB17"
+        let databaseAPI = DatabaseAPI.dev
+        let webservice = WebserviceProvider(inMode: databaseAPI)
+        let orderService = OrderService(databaseAPI: webservice.databaseAPI)
 
-            let order = try? await orderService.getOrder(by: orderId)
+        // Warmup
+        _ = try? await orderService.getOrder(by: orderId)
+
+        // Jetzt messen
+        let start = Date()
+
+        for _ in 0 ..< 10 {
+            let order = try await orderService.getOrder(by: orderId)
             XCTAssertNotNil(order, "Order should not be nil")
-            XCTAssertEqual(order?.id.uuidString, orderId, "Order ID should match")
-            print("Fetched order: \(order)")
-
-            let expectedItemsCount = 4
+            XCTAssertEqual(order.id.uuidString, orderId, "Order ID should match")
         }
 
+        let duration = Date().timeIntervalSince(start)
+        let average = duration / 10.0
+        print("Average time per fetch: \(average) seconds")
     }
-
-
-
-
 }
