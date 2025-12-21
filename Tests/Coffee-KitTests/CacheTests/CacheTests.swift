@@ -8,8 +8,11 @@
 @testable import Coffee_Kit
 import Foundation
 import XCTest
+import OSLog
 
 final class CacheTests: XCTestCase {
+    
+    private let log = Logger(subsystem: "Coffee-Kit Tests", category: "CacheTests")
     private let ids = ["e074867a-0c6a-49ff-87ca-b1ba5dae5236",
                        "07515180-3f06-46ab-99ce-64660db57cb8",
                        "3cfc8e2b-95b1-461c-a84b-21215dee5a7f",
@@ -27,7 +30,7 @@ final class CacheTests: XCTestCase {
 
     func testCaching() async throws {
         let productService = await ProductService(databaseAPI: .dev)
-        let cache = Cache<String, Product>(memoryLimit: 200)
+        let cache = Cache<String, Product>(memoryLimitInMB: 200)
         let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 
         guard let _ = try? await cache.fetch(key: cappuccinoId, with: productService.load)
@@ -97,4 +100,33 @@ final class CacheTests: XCTestCase {
         let cachedData = await imageCache.get(key: testProduct.imageName)
         XCTAssertNotNil(cachedData, "Cached image data should not be nil")
     }
+    
+    
+    func testFetchingPerformance() async {
+        let productService = await ProductService(databaseAPI: .dev)
+        let cache = Cache<String, Product>(memoryLimitInMB: 50)
+        let ids = try! await productService.getIds()
+        let measureOptions = XCTMeasureOptions()
+        measureOptions.iterationCount = 10
+    
+        measure(metrics: [XCTApplicationLaunchMetric()], options: measureOptions) {
+            let exp = expectation(description: "Fetch all")
+            Task(name: "Featch Products into Cache") {
+                for id in ids {
+                    _ = try? await cache.fetch(key: id, with: productService.load)
+                }
+                // Optional: prüfe hier den Zustand
+//                 let count = await cache.count
+//                 XCTAssertEqual(count, ids.count)
+                
+                exp.fulfill()
+            }
+            
+            wait(for: [exp], timeout: 1.0)
+        }
+        let count = await cache.count
+        log.info("Fetched all products, cache size: \(count)")
+
+    }
+    
 }
