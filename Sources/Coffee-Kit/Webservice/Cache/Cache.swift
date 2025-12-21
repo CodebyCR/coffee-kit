@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import OSLog
 
-public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
+public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Value: Sendable & CustomDebugStringConvertible> {
+    let log = Logger(subsystem: "Coffee-Kit", category: "Cache")
+    
     // MARK: - Properties
 
     /// The  size of the cache in bytes.
@@ -28,9 +31,9 @@ public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
         memoryUsage = MemoryLayout.size(ofValue: cache)
     }
 
-    public init(memoryLimit: Int) {
-        precondition(memoryLimit >= 0, "memoryLimit cannot be negative.")
-        self.memoryLimit = memoryLimit
+    public init(memoryLimitInMB: Int) {
+        precondition(memoryLimitInMB >= 0, "memoryLimit can not be negative.")
+        self.memoryLimit = memoryLimitInMB * 1024 * 1024
         cache = [:]
         memoryUsage = MemoryLayout.size(ofValue: cache)
     }
@@ -53,10 +56,10 @@ public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
     ///   - Throws: An error if the fetching process fails.
     @Sendable public static func create(
         by keyList: [Key],
-        limitedTo memoryLimit: Int = 50 * 1024 * 1024,
+        limitedTo memoryLimit: Int = 50,
         with fetcher: @Sendable @escaping (Key) async throws -> Value
     ) async throws -> Cache<Key, Value> {
-        let cache = Cache<Key, Value>(memoryLimit: memoryLimit)
+        let cache = Cache<Key, Value>(memoryLimitInMB: memoryLimit)
 
         try await withThrowingTaskGroup(of: (Key, Value).self) { group in
             for key in keyList {
@@ -118,12 +121,14 @@ public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
 
     public func fetch(key: Key, with fetcher: @escaping (Key) async throws -> Value) async throws -> Value {
         if let value = cache[key] {
+            //log.info("Cached Item found for Key: \(key.debugDescription, privacy: .public)")
             return value
         }
 
         let value = try await fetcher(key)
 
         if !maxCacheSizeReached(with: MemoryLayout.size(ofValue: value)) {
+            //log.info("Max Cache size not reached. Adding to cache.")
             self[key] = value
         }
 
@@ -135,12 +140,14 @@ public actor Cache<Key: Hashable & Sendable, Value: Sendable> {
     }
 
     public func set(key: Key, value: Value) {
+        //log.info("Set into cache with key: \(key.debugDescription, privacy: .public) and value: \(value.debugDescription, privacy: .public)" )
+        
         if let oldValue = cache[key] {
             memoryUsage -= MemoryLayout.size(ofValue: oldValue)
         }
 
         if maxCacheSizeReached(with: MemoryLayout.size(ofValue: value)) {
-            print("Cache size limit reached. Cannot add new value.")
+            //log.info("Cache size limit reached. Cannot add new value.")
             return
         }
 
