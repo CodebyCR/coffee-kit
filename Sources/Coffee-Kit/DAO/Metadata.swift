@@ -25,16 +25,10 @@ public struct Metadata: Sendable, Codable, Hashable, CustomDebugStringConvertibl
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        // sqlite3 date format
-        let sqlite3DateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = sqlite3DateFormat
-        let createdAtString = try container.decode(String.self, forKey: .createdAt)
-        createdAt = dateFormatter.date(from: createdAtString) ?? Date()
-        let updatedAtString = try container.decode(String.self, forKey: .updatedAt)
-        updatedAt = dateFormatter.date(from: updatedAtString) ?? Date()
-        //tagIds = try container.decode([String].self, forKey: .tagIds)
+        let createdAtTimeinterval = try? container.decode(TimeInterval.self, forKey: .createdAt)
+        createdAt = Date(timeIntervalSince1970: createdAtTimeinterval ?? Date.now.timeIntervalSince1970)
+        let updatedAtTimeinterval = try? container.decode(TimeInterval.self, forKey: .updatedAt)
+        updatedAt = Date(timeIntervalSince1970: updatedAtTimeinterval ?? Date.now.timeIntervalSince1970)
     }
 
     public func encode(to encoder: Encoder) throws {

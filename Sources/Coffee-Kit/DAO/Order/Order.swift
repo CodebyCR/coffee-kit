@@ -27,7 +27,8 @@ public extension Order {
         // demo
         id = UUID(uuidString: "2E2F208E-9EBB-4B40-801D-BDD5859858C3")!
         userId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
-        orderDate = Date(timeIntervalSince1970: 763811237.81686)
+        let orderTimeInterval: TimeInterval = 16_725_120_000
+        orderDate = Date(timeIntervalSince1970: orderTimeInterval)
         orderStatus = "ordered"
         paymentOption = "Cash"
         paymentStatus = "pending"
@@ -89,7 +90,7 @@ extension Order: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
         userId = try container.decode(UUID.self, forKey: .userId)
-        let rawOrderDate = try container.decode(Float64.self, forKey: .orderDate)
+        let rawOrderDate = try container.decode(TimeInterval.self, forKey: .orderDate)
         orderDate = Date(timeIntervalSince1970: rawOrderDate)
         orderStatus = try container.decode(String.self, forKey: .orderStatus)
         paymentOption = try container.decode(String.self, forKey: .paymentOption)
