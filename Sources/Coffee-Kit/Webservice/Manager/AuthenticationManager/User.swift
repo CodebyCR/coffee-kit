@@ -61,3 +61,8 @@ extension User: Hashable {
         lhs.id == rhs.id && lhs.name == rhs.name && lhs.email == rhs.email
     }
 }
+
+struct LoginResponse: Codable {
+    let token: String
+}
+
