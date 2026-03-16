@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 public struct WebserviceProvider{
     public let databaseAPI: DatabaseAPI
 
@@ -18,7 +17,5 @@ public struct WebserviceProvider{
     public var orderService: OrderService {
         return OrderService(databaseAPI: databaseAPI)
     }
-
-
 
 }

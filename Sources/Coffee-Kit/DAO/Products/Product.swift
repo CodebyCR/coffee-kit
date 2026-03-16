@@ -8,37 +8,79 @@
 import Foundation
 
 public struct Product {
-    public let id: UUID
-    public let category: String
-    public let categoryNumber: UInt16
-    public let name: String
-    public let price: Float64
-    public let imageName: String
-    public let metadata: Metadata
+    private var storage: Storage
+    
+    // MARK: - Storage Class für Copy-on-Write
+    
+    private final class Storage {
+        let id: UUID
+        let category: String
+        let categoryNumber: UInt16
+        let name: String
+        let price: Float64
+        let imageName: String
+        let metadata: Metadata
+        
+        init(id: UUID,
+             category: String,
+             categoryNumber: UInt16,
+             name: String,
+             price: Float64,
+             imageName: String,
+             metadata: Metadata
+        ) {
+            self.id = id
+            self.category = category
+            self.categoryNumber = categoryNumber
+            self.name = name
+            self.price = price
+            self.imageName = imageName
+            self.metadata = metadata
+        }
+    }
+    
+    // MARK: - Public Properties (read-only)
+    
+    public var id: UUID { storage.id }
+    public var category: String { storage.category }
+    public var categoryNumber: UInt16 { storage.categoryNumber }
+    public var name: String { storage.name }
+    public var price: Float64 { storage.price }
+    public var imageName: String { storage.imageName }
+    public var metadata: Metadata { storage.metadata }
+    
+    // MARK: - Initializer
+    
+    public init(id: UUID, category: String, categoryNumber: UInt16, name: String,
+                price: Float64, imageName: String, metadata: Metadata) {
+        self.storage = Storage(id: id, category: category, categoryNumber: categoryNumber,
+                              name: name, price: price, imageName: imageName, metadata: metadata)
+    }
 }
 
-// MARK: - default init
+// MARK: - Default Init
 
 public extension Product {
     init() {
-        id = UUID()
-        category = "Coffee"
-        categoryNumber = 1
-        name = "Caffee"
-        price = 3.20
-        imageName = "Mocha.png"
-        metadata = Metadata()
+        self.init(
+            id: UUID(),
+            category: "Coffee",
+            categoryNumber: 1,
+            name: "Caffee",
+            price: 3.20,
+            imageName: "Mocha.png",
+            metadata: Metadata()
+        )
     }
 }
 
-// MARK: - Computed properties
+// MARK: - Computed Properties
 
 public extension Product {
     var imageUrl: URL? {
-        URL(string: "http://127.0.0.1:8080/test/images/\(self.category)/\(self.imageName)")
+        URL(string: "http://127.0.0.1:8080/test/images/\(category)/\(imageName)")
     }
 }
-
 
 // MARK: - Identifiable
 
@@ -76,23 +118,20 @@ extension Product: Codable {
         case price
         case imageName = "image_name"
         case metadata
-
-        enum MetadataKeys: String, CodingKey {
-            case createdAt = "created_at"
-            case updatedAt = "updated_at"
-            case tagIds = "tag_ids"
-        }
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        category = try container.decode(String.self, forKey: .category)
-        categoryNumber = try container.decode(UInt16.self, forKey: .categoryNumber)
-        name = try container.decode(String.self, forKey: .name)
-        price = try container.decode(Float64.self, forKey: .price)
-        imageName = try container.decode(String.self, forKey: .imageName)
-        metadata = try container.decode(Metadata.self, forKey: .metadata)
+        let id = try container.decode(UUID.self, forKey: .id)
+        let category = try container.decode(String.self, forKey: .category)
+        let categoryNumber = try container.decode(UInt16.self, forKey: .categoryNumber)
+        let name = try container.decode(String.self, forKey: .name)
+        let price = try container.decode(Float64.self, forKey: .price)
+        let imageName = try container.decode(String.self, forKey: .imageName)
+        let metadata = try container.decode(Metadata.self, forKey: .metadata)
+        
+        self.init(id: id, category: category, categoryNumber: categoryNumber,
+                 name: name, price: price, imageName: imageName, metadata: metadata)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -103,12 +142,7 @@ extension Product: Codable {
         try container.encode(category, forKey: .category)
         try container.encode(categoryNumber, forKey: .categoryNumber)
         try container.encode(imageName, forKey: .imageName)
-
-        var metadataContainer = container.nestedContainer(keyedBy: Metadata.CodingKeys.self, forKey: .metadata)
-        try metadataContainer.encode(metadata.createdAt, forKey: .createdAt)
-        try metadataContainer.encode(metadata.updatedAt, forKey: .updatedAt)
-
-        // try metadataContainer.encode(metadata.tagIds, forKey: .tagIds)
+        try container.encode(metadata, forKey: .metadata)
     }
 }
 
@@ -117,10 +151,10 @@ extension Product: Codable {
 extension Product: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-//        hasher.combine(category)
-//        hasher.combine(categoryNumber)
         hasher.combine(name)
-//        hasher.combine(price)
-//        hasher.combine(metadata)
+    }
+    
+    public static func == (lhs: Product, rhs: Product) -> Bool {
+        lhs.id == rhs.id && lhs.name == rhs.name
     }
 }

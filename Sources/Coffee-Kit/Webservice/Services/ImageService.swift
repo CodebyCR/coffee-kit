@@ -11,7 +11,7 @@ public enum ImageServiceError: Error {
     case imageNotFound
 }
 
-@MainActor
+
 public struct ImageService {
     private let imageUrl: URL
     private let urlSession: URLSession
@@ -44,15 +44,18 @@ public struct ImageService {
         return data
     }
 
+    @concurrent
     @Sendable public func getImageData(for product: borrowing Product) async throws -> Data {
-        if let cachedImage = await imageCache.get(key: product.imageName) {
+        let newImageName = product.imageName.replacing(".png", with: ".heic")
+        
+        if let cachedImage = await imageCache.get(key: newImageName) {
             return cachedImage
         }
 
-        let productImageUrl = imageUrl / product.category / product.imageName
+        let productImageUrl = imageUrl / product.category / newImageName
         let imageData = try await fetchImageData(from: productImageUrl)
 
-        await imageCache.set(key: product.imageName, value: imageData)
+        await imageCache.set(key: newImageName, value: imageData)
         return imageData
     }
 }

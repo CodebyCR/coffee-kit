@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class OrderProduct {
+public final class OrderProduct { // shold be @Observable and non sendable
     public let product: Product
     @Published public var quantity: UInt8
 

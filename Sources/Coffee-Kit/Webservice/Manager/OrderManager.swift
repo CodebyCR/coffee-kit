@@ -8,20 +8,17 @@
 import Foundation
 import OSLog
 
-@MainActor
 @Observable public final class OrderManager {
     @ObservationIgnored private var logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderManager")
     @ObservationIgnored private var webservice: WebserviceProvider
+    @ObservationIgnored private var orderService: OrderService
 
     private(set) var pendingOrders: [Order] = []
     private(set) var completedOrders: [Order] = []
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
-    }
-
-    public var orderService: OrderService {
-        OrderService(databaseAPI: webservice.databaseAPI)
+        self.orderService = OrderService(databaseAPI: webservice.databaseAPI)
     }
 
     public func takeOrder(from orderBuilder: OrderBuilder) -> Result<String, Error> {
@@ -41,7 +38,7 @@ import OSLog
     private func takeOrder(_ order: Order) {
         logger.info("\(order.debugDescription)")
 
-        Task {
+        Task(name: "Take Order", priority: .userInitiated) {
             do {
                 try await orderService.takeOrder(order)
                 pendingOrders.append(order)

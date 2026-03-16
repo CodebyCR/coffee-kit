@@ -7,7 +7,7 @@
 
 import Foundation
 
-@MainActor
+
 public struct ProductService {
     // MARK: Properties
 
@@ -100,9 +100,10 @@ public struct ProductService {
         }
     }
 
+
     @Sendable public func loadAll() async -> AsyncStream<Result<Product, Error>> {
         return AsyncStream<Result<Product, Error>> { continuation in
-            Task {
+            Task(priority: .userInitiated) {
                 do {
                     let ids = try await getIds()
                     for id in ids {
@@ -117,6 +118,16 @@ public struct ProductService {
         }
     }
 
+
+//    @Sendable public func loadAllWithGrouping() async -> AsyncStream<Result<Product, Error>> {
+//        
+//            
+//
+//    }
+    
+    
+
+    @concurrent
     @Sendable public func fillUpCache() async throws {
         guard let ids = try? await getIds()
         else {

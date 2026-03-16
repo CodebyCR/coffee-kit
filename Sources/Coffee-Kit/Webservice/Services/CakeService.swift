@@ -7,7 +7,7 @@
 
 import Foundation
 
-@MainActor
+
 public struct CakeService {
     // MARK: Properties
 

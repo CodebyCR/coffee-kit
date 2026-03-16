@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 @Observable public final class ImageManager {
     // MARK: - Properties
 
@@ -33,4 +32,9 @@ import Foundation
         }
         return imageData
     }
+}
+
+// MARK: Sendable conformance
+
+extension ImageManager: Sendable {
 }

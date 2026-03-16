@@ -8,7 +8,6 @@
 import Foundation
 import OSLog
 
-@MainActor
 public struct OrderService {
     // MARK: - Properties
 

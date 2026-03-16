@@ -7,35 +7,41 @@
 
 import Foundation
 
-@MainActor
+
 @Observable public final class MenuManager {
     // MARK: - Properties
 
     @ObservationIgnored
     private let webservice: WebserviceProvider
+    public let productService: ProductService
 
     public var items: [Product] = []
-
-    // MARK: - Computed Properties
-
-    public var productService: ProductService {
-        return ProductService(databaseAPI: webservice.databaseAPI)
-    }
 
     // MARK: - Initializer
 
     public init() {
         self.webservice = WebserviceProvider(inMode: .dev)
+        self.productService = ProductService(databaseAPI: webservice.databaseAPI)
     }
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
+        self.productService = ProductService(databaseAPI: webservice.databaseAPI)
     }
 
     // MARK: - Methods
 
     public func getSelection(for category: MenuCategory) -> [Product] {
         return items.filter { $0.category == category.rawValue.lowercased() }
+    }
+    
+
+    public func getSelection(for category: MenuCategory, with lookupUpValue: String = "") -> [Product] {
+        let filteredItems = items.filter { $0.category == category.rawValue.lowercased() }
+        guard !lookupUpValue.isEmpty else {
+            return filteredItems
+        }
+        return filteredItems.filter { $0.name.localizedCaseInsensitiveContains(lookupUpValue) }
     }
 
 //    public func getCachedItems() -> [Product] {
