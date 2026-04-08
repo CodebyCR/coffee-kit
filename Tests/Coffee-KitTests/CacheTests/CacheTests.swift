@@ -29,7 +29,7 @@ final class CacheTests: XCTestCase {
     // MARK: - Properties
 
     func testCaching() async throws {
-        let productService = await ProductService(databaseAPI: .dev)
+        let productService = ProductService(databaseAPI: .dev)
         let cache = Cache<String, Product>(memoryLimitInMB: 200)
         let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 

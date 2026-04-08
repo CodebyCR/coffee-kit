@@ -6,14 +6,13 @@
 //
 
 import Foundation
-import Authentication_Kit
 
 @frozen
 public enum LoginStatus {
     case idle
     case loading
     case loggedIn(User)
-    case error(LoginError)
+    case error(AuthenticationError)
     case loggedOut
 }
 
@@ -73,9 +72,3 @@ extension LoginStatus: Hashable {
         }
     }
 }
-
-
-
-
-
-

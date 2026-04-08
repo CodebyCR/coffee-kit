@@ -15,6 +15,10 @@ let package = Package(
             name: "Coffee-Kit",
             targets: ["Coffee-Kit"]
         ),
+        .library(
+            name: "Authentication-Kit",
+            targets: ["Authentication-Kit"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/perrystreetsoftware/Harmonize.git", from: "0.1.0"),
@@ -39,5 +43,16 @@ let package = Package(
                 .product(name: "Harmonize", package: "Harmonize"),
             ]
         ),
+        
+        .target(
+            name: "Authentication-Kit",
+            dependencies: [
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
+            ]
+        )
     ]
 )
