@@ -143,9 +143,12 @@ public final class AuthenticationBuilder {
             let loginResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
             
             // Tokens im AuthManager speichern
-            try await authManager.storeTokens(accessToken: loginResponse.token, refreshToken: nil) // Refresh Token falls vorhanden ergänzen
+            try await authManager.storeTokens(
+                accessToken: loginResponse.accessToken,
+                refreshToken: loginResponse.refreshToken
+            )
             
-            let user = User(email: email, name: "User", token: loginResponse.token)
+            let user = User(email: email, name: "User", token: loginResponse.accessToken)
             status = .loggedIn(user)
             
         } catch let error as AuthenticationError {
