@@ -118,6 +118,12 @@ public final class AuthenticationBuilder {
     }
     
     @MainActor
+    public func logout() async {
+        await authManager.logout()
+        status = .loggedOut
+    }
+    
+    @MainActor
     public func login() async {
         status = .loading
         

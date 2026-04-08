@@ -55,6 +55,17 @@ public actor AutenticationManager {
         }
     }
     
+    /// Löscht alle gespeicherten Tokens (Logout)
+    public func logout() async {
+        do {
+            try await keychain.delete(account: account, service: accessTokenService)
+            try await keychain.delete(account: account, service: refreshTokenService)
+            print("👤 User logged out and tokens cleared.")
+        } catch {
+            print("⚠️ Error during logout: \(error)")
+        }
+    }
+
     // Hilfsfunktion zum lokalen Lesen
     private func getLocalAccessToken() async throws(AuthenticationError) -> String {
         do {
