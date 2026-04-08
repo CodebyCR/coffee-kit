@@ -6,16 +6,23 @@
 //
 
 import Foundation
+import Authentication_Kit
 
 public struct WebserviceProvider{
     public let databaseAPI: DatabaseAPI
+    public let authManager: AutenticationManager?
 
-    public init(inMode databaseAPI: consuming DatabaseAPI) {
+    public init(inMode databaseAPI: consuming DatabaseAPI, authManager: AutenticationManager? = nil) {
         self.databaseAPI = databaseAPI
+        self.authManager = authManager
     }
 
     public var orderService: OrderService {
-        return OrderService(databaseAPI: databaseAPI)
+        return OrderService(databaseAPI: databaseAPI, authManager: authManager)
+    }
+    
+    public var productService: ProductService {
+        return ProductService(databaseAPI: databaseAPI, authManager: authManager)
     }
 
 }

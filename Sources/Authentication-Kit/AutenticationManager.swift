@@ -65,6 +65,23 @@ public actor AutenticationManager {
         }
     }
     
+    /// Reichert einen URLRequest mit dem aktuellen AccessToken an (falls vorhanden)
+    public func authenticate(_ request: inout URLRequest) async {
+        // Wenn kein Refresh-Token da ist, sind wir nicht eingeloggt
+        // Wir werfen hier keinen Fehler, damit öffentliche Requests (z.B. Menü) funktionieren.
+        guard (try? await keychain.read(account: account, service: refreshTokenService)) != nil else {
+            print("ℹ️ No session active. Skipping authentication header.")
+            return
+        }
+        
+        do {
+            let token = try await getValidAccessToken()
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } catch {
+            print("⚠️ Authentication failed: \(error)")
+        }
+    }
+
     /// Holt einen neuen AccessToken, schützt aber vor parallelen Aufrufen!
     private func refreshSession() async throws -> String {
         

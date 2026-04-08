@@ -7,6 +7,7 @@
 
 import Foundation
 import OSLog
+import Authentication_Kit
 
 public struct OrderService {
     // MARK: - Properties
@@ -14,16 +15,18 @@ public struct OrderService {
     private let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderService")
     private let orderUrl: URL
     private let urlSession: URLSession
+    private let authManager: AutenticationManager?
 
     // MARK: - Initializer
 
-    init(databaseAPI: borrowing DatabaseAPI) {
+    init(databaseAPI: borrowing DatabaseAPI, authManager: AutenticationManager? = nil) {
         let urlSessionConfiguration = URLSessionConfiguration.default
         urlSessionConfiguration.timeoutIntervalForRequest = 14
         urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
 
         self.urlSession = URLSession(configuration: urlSessionConfiguration)
         self.orderUrl = databaseAPI.baseURL / "order"
+        self.authManager = authManager
     }
 
     // MARK: - Methods
@@ -35,6 +38,11 @@ public struct OrderService {
         request.httpMethod = "POST"
         request.httpBody = requestData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Authentication
+        if let authManager = authManager {
+            await authManager.authenticate(&request)
+        }
 
         logger.debug("Post to \(createOrderURL)")
 
@@ -58,7 +66,14 @@ public struct OrderService {
 
     public func getOrder(by id: String) async throws -> Order {
         let orderByIdUrl = orderUrl / "id/\(id)"
-        let (data, response) = try await urlSession.data(from: orderByIdUrl)
+        var request = URLRequest(url: orderByIdUrl)
+        
+        // Authentication
+        if let authManager = authManager {
+            await authManager.authenticate(&request)
+        }
+        
+        let (data, response) = try await urlSession.data(for: request)
 
         guard let order = try? JSONDecoder().decode(Order.self, from: data) else {
             print(response)

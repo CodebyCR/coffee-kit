@@ -29,6 +29,7 @@ let package = Package(
         .target(
             name: "Coffee-Kit",
             dependencies: [
+                "Authentication-Kit"
             ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency"),
