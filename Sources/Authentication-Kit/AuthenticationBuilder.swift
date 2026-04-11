@@ -48,8 +48,8 @@ public final class AuthenticationBuilder {
     public var status: LoginStatus = .idle
     
     private let authManager: AutenticationManager
-    private let baseURL: URL
-    private let session = URLSession.shared
+    @ObservationIgnored private let baseURL: URL
+    @ObservationIgnored private let session = URLSession.shared
 
     public init(
         authManager: AutenticationManager,
