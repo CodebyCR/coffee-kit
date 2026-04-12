@@ -8,13 +8,15 @@
 import Foundation
 import OSLog
 
-@Observable public final class OrderManager {
+@Observable
+public final class OrderManager {
     @ObservationIgnored private var logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderManager")
     @ObservationIgnored private var webservice: WebserviceProvider
     @ObservationIgnored private var orderService: OrderService
 
     private(set) var pendingOrders: [Order] = []
     private(set) var completedOrders: [Order] = []
+    public var currentOrder: Order { pendingOrders.first ?? Order()}
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice

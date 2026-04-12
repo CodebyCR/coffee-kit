@@ -7,9 +7,10 @@
 
 import Foundation
 
+@Observable
 public final class OrderProduct { // shold be @Observable and non sendable
-    public let product: Product
-    @Published public var quantity: UInt8
+    @ObservationIgnored public let product: Product
+    public var quantity: UInt8
 
     // MARK: - Initializer
 
@@ -42,9 +43,9 @@ extension OrderProduct: Identifiable {
     }
 }
 
-// MARK: - Sendable
-
-extension OrderProduct: Sendable {}
+//// MARK: - Sendable
+//
+//extension OrderProduct: Sendable {}
 
 // MARK: - CustomDebugStringConvertible
 
