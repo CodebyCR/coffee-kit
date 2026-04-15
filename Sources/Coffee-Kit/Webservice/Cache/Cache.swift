@@ -95,26 +95,6 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
         }
     }
 
-//    @Sendable public func fillUp(
-//        by keyList: [Key],
-//        use fetcher: MenuFetchAction<Key, Value>
-//    ) async throws {
-//
-//        try await withThrowingTaskGroup(of: (Key, Value).self) { group in
-//            for key in keyList {
-//                group.addTask {
-//                    let value = try await fetcher(key)
-//                    return (key, value)
-//                }
-//            }
-//
-//            for try await (key, value) in group {
-//                self.set(key: key, value: value)
-//            }
-//        }
-//
-//    }
-
     // MARK: - Methods
 
     // init with id list, welche fetched mit TaskGroup

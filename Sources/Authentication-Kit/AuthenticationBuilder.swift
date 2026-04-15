@@ -155,12 +155,51 @@ public final class AuthenticationBuilder {
             )
             
             let user = User(email: email, name: "User", token: loginResponse.accessToken)
+            
+            // Benutzer im AuthManager speichern
+            try await authManager.storeUser(user)
+            
             status = .loggedIn(user)
             
         } catch let error as AuthenticationError {
             status = .error(error)
         } catch {
             status = .error(.serverError(error.localizedDescription))
+        }
+    }
+
+    /// Prüft, ob eine gültige Session (Token/User) existiert
+    @MainActor
+    public func checkPersistentLogin() async {
+        status = .loading
+        
+        // 1. Haben wir einen gespeicherten User?
+        guard let savedUser = await authManager.restoreUser() else {
+            status = .idle
+            return
+        }
+
+        // 2. Haben wir einen gültigen (oder refresh-baren) Token?
+        do {
+            let token = try await authManager.getValidAccessToken()
+            
+            // Wenn der Token sich geändert hat, bauen wir das User-Objekt neu zusammen
+            let updatedUser = User(
+                id: savedUser.id,
+                email: savedUser.email,
+                name: savedUser.name,
+                token: token
+            )
+            
+            // Den aktualisierten User auch speichern (für den Token)
+            try? await authManager.storeUser(updatedUser)
+            
+            status = .loggedIn(updatedUser)
+            print("🔐 Restored session for \(updatedUser.name)")
+            
+        } catch {
+            print("ℹ️ Session expired or invalid: \(error)")
+            status = .loggedOut
         }
     }
 

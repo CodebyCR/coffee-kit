@@ -1,7 +1,7 @@
 
 import Foundation
 
-public struct User: Identifiable {
+nonisolated public struct User: Identifiable {
     public let id: UUID
     public let name: String
     public let email: String
@@ -13,21 +13,22 @@ public struct User: Identifiable {
         self.name = name
         self.token = token
     }
+
 }
 
 // MARK: - Sendable
 extension User: Sendable {}
 
 // MARK: - Codable
-extension User: Codable {
-    enum CodingKeys: String, CodingKey {
+nonisolated extension User: Codable {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id
         case name
         case email
         case token
     }
 
-    public init(from decoder: any Decoder) throws {
+    nonisolated public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
@@ -35,7 +36,7 @@ extension User: Codable {
         token = try container.decode(String.self, forKey: .token)
     }
 
-    public func encode(to encoder: any Encoder) throws {
+    nonisolated public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)

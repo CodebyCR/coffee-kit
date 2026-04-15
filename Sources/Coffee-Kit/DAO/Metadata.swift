@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public struct Metadata: Sendable, Codable, Hashable, CustomDebugStringConvertible {
+nonisolated public struct Metadata: Sendable, Codable, Hashable, CustomDebugStringConvertible {
     let createdAt: Date
     let updatedAt: Date
     //let tagIds: [String]

@@ -52,7 +52,7 @@ public struct ImageService {
             return cachedImage
         }
 
-        let productImageUrl = imageUrl / product.category / newImageName
+        let productImageUrl = await imageUrl / product.category / newImageName
         let imageData = try await fetchImageData(from: productImageUrl)
 
         await imageCache.set(key: newImageName, value: imageData)

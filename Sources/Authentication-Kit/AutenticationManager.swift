@@ -8,6 +8,7 @@ public actor AutenticationManager {
     private let account = "currentUser"
     private let accessTokenService = "CoffeeLover.AccessToken"
     private let refreshTokenService = "CoffeeLover.RefreshToken"
+    private let userService = "CoffeeLover.User"
     
     private let baseURL: URL
 
@@ -54,13 +55,37 @@ public actor AutenticationManager {
             throw .keychainError(error)
         }
     }
+
+    /// Speichert den Benutzer
+    public func storeUser(_ user: User) async throws(AuthenticationError) {
+        do {
+            let userEncoder = JSONEncoder()
+            let data = try userEncoder.encode(user)
+            try await keychain.save(data, account: account, service: userService)
+        } catch {
+            throw .keychainError(error as! KeychainError)
+        }
+    }
+
+    /// Lädt den gespeicherten Benutzer
+    public func restoreUser() async -> User? {
+        do {
+            let data = try await keychain.read(account: account, service: userService)
+            let userDecoder = JSONDecoder()
+            return try userDecoder.decode(User.self, from: data)
+        } catch {
+            print("ℹ️ No user data found in keychain.")
+            return nil
+        }
+    }
     
     /// Löscht alle gespeicherten Tokens (Logout)
     public func logout() async {
         do {
             try await keychain.delete(account: account, service: accessTokenService)
             try await keychain.delete(account: account, service: refreshTokenService)
-            print("👤 User logged out and tokens cleared.")
+            try await keychain.delete(account: account, service: userService)
+            print("👤 User logged out and tokens/data cleared.")
         } catch {
             print("⚠️ Error during logout: \(error)")
         }
