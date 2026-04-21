@@ -15,12 +15,12 @@ public final class OrderManager {
     @ObservationIgnored private var orderService: OrderService
 
     private(set) var pendingOrders: [Order] = []
-    private(set) var completedOrders: [Order] = []
-    public var currentOrder: Order { pendingOrders.first ?? Order()}
+    public var orderHistory: [Order] = []
+    public var currentOrder: Order? { pendingOrders.first }
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
-        self.orderService = OrderService(databaseAPI: webservice.databaseAPI)
+        self.orderService = webservice.orderService
     }
 
     public func takeOrder(from orderBuilder: OrderBuilder) -> Result<String, Error> {
@@ -28,6 +28,7 @@ public final class OrderManager {
 
         do {
             let newOrder = try orderBuilder.build()
+            pendingOrders.append(newOrder)
             takeOrder(newOrder)
             return .success("Your order will arrive soon.")
 
@@ -65,5 +66,23 @@ public final class OrderManager {
         }
 
         return websocketService.receive()
+    }
+    
+    /// Load the order history for the user.
+    /// This method  feched 20 orders at a time and appends them to the `completedOrders`. (Keyset pagination)
+    public func loadOrderHistory(before date: Date = .now) async {
+        let lastOrderDate = date
+        
+        do {
+            let fetchedOrders = await try orderService.fetchOrderHistory(before: lastOrderDate)
+            print("Fetched \(fetchedOrders.count) orders")
+            orderHistory.append(contentsOf: fetchedOrders)
+        }
+        catch {
+            logger.error("""
+                        Error in '\(#function)': 
+                        \(error)   
+                        """)
+        }
     }
 }

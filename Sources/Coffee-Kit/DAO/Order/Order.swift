@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public struct Order {
+nonisolated public struct Order {
     public let id: UUID
     public let userId: UUID
     public let orderDate: Date
@@ -22,7 +22,7 @@ public struct Order {
 
 // MARK: - Initializer
 
-public extension Order {
+nonisolated public extension Order {
     init() {
         // demo
         id = UUID(uuidString: "2E2F208E-9EBB-4B40-801D-BDD5859858C3")!
@@ -50,15 +50,15 @@ public extension Order {
 
 // MARK: - Identifiable
 
-extension Order: Identifiable {}
+nonisolated extension Order: Identifiable {}
 
 // MARK: - Sendable
 
-extension Order: Sendable {}
+nonisolated extension Order: Sendable {}
 
 // MARK: - CustomDebugStringConvertible
 
-extension Order: CustomDebugStringConvertible {
+nonisolated extension Order: CustomDebugStringConvertible {
     public var debugDescription: String {
         """
         Order:
@@ -75,7 +75,7 @@ extension Order: CustomDebugStringConvertible {
 
 // MARK: - Codeable
 
-extension Order: Codable {
+nonisolated extension Order: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"
@@ -102,7 +102,7 @@ extension Order: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(userId, forKey: .userId)
-        try container.encode(orderDate, forKey: .orderDate)
+        try container.encode(orderDate.timeIntervalSince1970, forKey: .orderDate)
         try container.encode(orderStatus, forKey: .orderStatus)
         try container.encode(paymentOption, forKey: .paymentOption)
         try container.encode(paymentStatus, forKey: .paymentStatus)
@@ -110,5 +110,12 @@ extension Order: Codable {
     }
 }
 
+nonisolated extension Order: Equatable {
+    
+    public static func == (lhs: Order, rhs: Order) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+}
 
-
+nonisolated extension Order: Hashable {}

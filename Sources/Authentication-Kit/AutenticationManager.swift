@@ -44,26 +44,24 @@ public actor AutenticationManager {
         return try await refreshSession()
     }
     
-    /// Speichert initiale Tokens nach dem Login
-    public func storeTokens(accessToken: String, refreshToken: String?) async throws(AuthenticationError) {
+    public func storeTokens(accessToken: String, refreshToken: String?) async throws {
         do {
             try await keychain.save(Data(accessToken.utf8), account: account, service: accessTokenService)
             if let refreshToken = refreshToken {
                 try await keychain.save(Data(refreshToken.utf8), account: account, service: refreshTokenService)
             }
         } catch {
-            throw .keychainError(error)
+            throw AuthenticationError.keychainError(error)
         }
     }
 
-    /// Speichert den Benutzer
-    public func storeUser(_ user: User) async throws(AuthenticationError) {
+    public func storeUser(_ user: User) async throws {
         do {
             let userEncoder = JSONEncoder()
             let data = try userEncoder.encode(user)
             try await keychain.save(data, account: account, service: userService)
         } catch {
-            throw .keychainError(error as! KeychainError)
+            throw AuthenticationError.keychainError(error as! KeychainError)
         }
     }
 
@@ -101,20 +99,22 @@ public actor AutenticationManager {
         }
     }
     
-    /// Reichert einen URLRequest mit dem aktuellen AccessToken an (falls vorhanden)
     public func authenticate(_ request: inout URLRequest) async {
         // Wenn kein Refresh-Token da ist, sind wir nicht eingeloggt
         // Wir werfen hier keinen Fehler, damit öffentliche Requests (z.B. Menü) funktionieren.
-        guard (try? await keychain.read(account: account, service: refreshTokenService)) != nil else {
-            print("ℹ️ No session active. Skipping authentication header.")
+        do {
+            _ = try await keychain.read(account: account, service: refreshTokenService)
+        } catch {
+            print("ℹ️ No session active (Keychain error: \(error)). Skipping authentication header for \(request.url?.absoluteString ?? "unknown URL").")
             return
         }
         
         do {
             let token = try await getValidAccessToken()
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("✅ Added Authorization header to \(request.url?.absoluteString ?? "unknown URL").")
         } catch {
-            print("⚠️ Authentication failed: \(error)")
+            print("⚠️ Authentication failed for \(request.url?.absoluteString ?? "unknown URL"): \(error)")
         }
     }
 

@@ -16,7 +16,7 @@ final class OrderTests: XCTestCase {
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
 
     func testTakingOrder() async {
-        await logger.trackTask(called: "testTakingOrder") {
+        
             let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
             let databaseAPI = DatabaseAPI.dev
             let webservice = WebserviceProvider(inMode: databaseAPI)
@@ -36,11 +36,11 @@ final class OrderTests: XCTestCase {
                 print("Order failed with error: \(error)")
                 XCTAssertNoThrow(error)
             }
-        }
+        
         // Delete test order
     }
 
-    func testDecodeOrder() {
+    func testDecodeOrder() throws {
         let orderJson = """
         {
             "user_id": "03F35975-AF57-4691-811F-4AB872FDB51B",

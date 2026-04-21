@@ -26,7 +26,7 @@ import Foundation
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
-        self.productService = ProductService(databaseAPI: webservice.databaseAPI)
+        self.productService = webservice.productService
     }
 
     // MARK: - Methods
@@ -53,7 +53,6 @@ import Foundation
 //    }
 
     @Sendable public func fillUpCache() async {
-        let productService = ProductService(databaseAPI: webservice.databaseAPI)
         do {
             try await productService.fillUpCache()
         } catch {

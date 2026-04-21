@@ -7,23 +7,14 @@
 
 import Foundation
 
-public struct OrderItem {
+nonisolated public struct OrderItem {
     public let id: UUID
     public var quantity: UInt8
 }
 
-// MARK: - Initializer
-
-public extension OrderItem {
-    init(from oderProduct: OrderProduct) {
-        id = oderProduct.id
-        quantity = oderProduct.quantity
-    }
-}
-
 // MARK: - Codable
 
-extension OrderItem: Codable {
+nonisolated extension OrderItem: Codable {
     enum CodingKeys: String, CodingKey {
         case quantity
         case id
@@ -44,15 +35,15 @@ extension OrderItem: Codable {
 
 // MARK: - Identifiable
 
-extension OrderItem: Identifiable {}
+nonisolated extension OrderItem: Identifiable {}
 
 // MARK: - Sendable
 
-extension OrderItem: Sendable {}
+nonisolated extension OrderItem: Sendable {}
 
 // MARK: - CustomDebugStringConvertible
 
-extension OrderItem: CustomDebugStringConvertible {
+nonisolated extension OrderItem: CustomDebugStringConvertible {
     public var debugDescription: String {
         """
         OrderItem:
@@ -61,5 +52,15 @@ extension OrderItem: CustomDebugStringConvertible {
         """
     }
 }
+
+nonisolated extension OrderItem: Equatable {
+    
+    public static func == (lhs: OrderItem, rhs: OrderItem) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+}
+
+nonisolated extension OrderItem: Hashable {}
 
 // MARK: - Methods

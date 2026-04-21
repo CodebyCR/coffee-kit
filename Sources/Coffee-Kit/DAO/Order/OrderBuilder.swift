@@ -89,7 +89,7 @@ import Foundation
             throw OrderBuilderError.emptyShopingCart
         }
 
-        let orderItems = products.map { OrderItem(from: $0) }
+        let orderItems = products.map { OrderItem(id: $0.id, quantity: $0.quantity) }
 
         // Currently fake user id and only cash payment is supported
         let newOrder = Order(userId: userId, orderdProducts: orderItems, paymentOption: .cash)
