@@ -155,7 +155,12 @@ public final class AuthenticationBuilder {
                 refreshToken: loginResponse.refreshToken
             )
             
-            let user = User(email: email, name: "User", token: loginResponse.accessToken)
+            let user = User(
+                id: loginResponse.id ?? UUID(),
+                email: email,
+                name: loginResponse.name ?? "User",
+                token: loginResponse.accessToken
+            )
             
             // Benutzer im AuthManager speichern
             try await authManager.storeUser(user)

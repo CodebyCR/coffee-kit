@@ -63,8 +63,8 @@ public struct OrderService {
         }
     }
 
-    public func getOrder(by id: String) async throws -> Order {
-        let orderByIdUrl = orderUrl / "id" / id
+    public func getOrder(by id: UUID) async throws -> Order {
+        let orderByIdUrl = orderUrl / "id" / "\(id)"
         var request = URLRequest(url: orderByIdUrl)
         
         // Authentication

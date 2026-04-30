@@ -18,6 +18,15 @@ nonisolated public struct Order {
     public var orderDateAsFloat64: Float64 {
         Float64(orderDate.timeIntervalSince1970)
     }
+    
+    public var totalItems: Int {
+        items.count
+    }
+    
+    public var totalPrice: Double {
+        //items.map(\.price).reduce(0, +)
+        12.75
+    }
 }
 
 // MARK: - Initializer
