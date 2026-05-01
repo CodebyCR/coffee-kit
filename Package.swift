@@ -12,13 +12,25 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Coffee-Kit",
-            targets: ["Coffee-Kit"]
+            name: "FoundationKit",
+            targets: ["FoundationKit"]
         ),
         .library(
-            name: "Authentication-Kit",
-            targets: ["Authentication-Kit"]
+            name: "AuthenticationKit",
+            targets: ["AuthenticationKit"]
         ),
+        .library(
+            name: "ImageKit",
+            targets: ["ImageKit"]
+        ),
+        .library(
+            name: "OrderKit",
+            targets: ["OrderKit"]
+        ),
+        .library(
+            name: "ProductKit",
+            targets: ["ProductKit"]
+        )
     ],
     dependencies: [
         .package(
