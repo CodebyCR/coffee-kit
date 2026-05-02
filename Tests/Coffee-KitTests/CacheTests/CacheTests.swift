@@ -5,10 +5,15 @@
 //  Created by Christoph Rohde on 16.05.25.
 //
 
-@testable import Coffee_Kit
+import CoffeeKit
 import Foundation
 import XCTest
 import OSLog
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 final class CacheTests: XCTestCase {
     

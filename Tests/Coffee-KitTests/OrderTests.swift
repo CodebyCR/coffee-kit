@@ -5,11 +5,15 @@
 //  Created by Christoph Rohde on 30.12.24.
 //
 
-@testable import Coffee_Kit
 import Combine
 import Foundation
 import OSLog
 import XCTest
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class OrderTests: XCTestCase {
@@ -77,7 +81,8 @@ final class OrderTests: XCTestCase {
     }
 
     func testFetchOrderById() async throws {
-        let orderId = "059621D5-C191-45A9-AB5B-B4B414E9DB17"
+        let orderIdString = "059621D5-C191-45A9-AB5B-B4B414E9DB17"
+        let orderId = UUID(uuidString: orderIdString)!
         let databaseAPI = DatabaseAPI.dev
         let webservice = WebserviceProvider(inMode: databaseAPI)
         let orderService = OrderService(databaseAPI: webservice.databaseAPI)
@@ -91,7 +96,7 @@ final class OrderTests: XCTestCase {
         for _ in 0 ..< 10 {
             let order = try await orderService.getOrder(by: orderId)
             XCTAssertNotNil(order, "Order should not be nil")
-            XCTAssertEqual(order.id.uuidString, orderId, "Order ID should match")
+            XCTAssertEqual(order.id, orderId, "Order ID should match")
         }
 
         let duration = Date().timeIntervalSince(start)

@@ -7,8 +7,11 @@
 
 import Foundation
 import XCTest
-@testable import Coffee_Kit
-
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class ProductServiceTests: XCTestCase {

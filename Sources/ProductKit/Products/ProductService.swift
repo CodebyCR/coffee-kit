@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import Authentication_Kit
+import FoundationKit
+import AuthenticationKit
 
 
 public struct ProductService {

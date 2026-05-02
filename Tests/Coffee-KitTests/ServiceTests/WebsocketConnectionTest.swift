@@ -5,9 +5,13 @@
 //  Created by Christoph Rohde on 25.10.25.
 //
 
-@testable import Coffee_Kit
 import Foundation
 import XCTest
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class WebsocketConnectionTest: XCTestCase {

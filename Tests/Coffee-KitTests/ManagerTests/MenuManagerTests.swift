@@ -5,10 +5,14 @@
 //  Created by Christoph Rohde on 15.05.25.
 //
 
+import CoffeeKit
 import Foundation
 import XCTest
-
-@testable import Coffee_Kit
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class MenuManagerTests: XCTestCase {

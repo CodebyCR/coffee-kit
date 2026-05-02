@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FoundationKit
 
 // MARK: - Main Struct
 
@@ -39,8 +40,9 @@ nonisolated public extension Product {
 // MARK: - Computed Properties
 
 public extension Product {
-    var imageUrl: URL? {
-        URL(string: "http://127.0.0.1:8080/test/images/\(category)/\(imageName)")
+    func imageUrl(relativeTo baseURL: URL) -> URL {
+        let newImageName = imageName.replacing(".png", with: ".heic")
+        return baseURL / "Images" / category / newImageName
     }
 }
 

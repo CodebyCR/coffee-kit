@@ -6,23 +6,17 @@
 //
 
 import Foundation
-import Authentication_Kit
 
-public struct WebserviceProvider{
+public protocol Authenticating: Sendable {
+    func authenticate(_ request: inout URLRequest) async
+}
+
+public struct WebserviceProvider {
     public let databaseAPI: DatabaseAPI
-    public let authManager: AutenticationManager?
+    public let authManager: (any Authenticating)?
 
-    public init(inMode databaseAPI: consuming DatabaseAPI, authManager: AutenticationManager? = nil) {
+    public init(inMode databaseAPI: consuming DatabaseAPI, authManager: (any Authenticating)? = nil) {
         self.databaseAPI = databaseAPI
         self.authManager = authManager
     }
-
-    public var orderService: OrderService {
-        return OrderService(databaseAPI: databaseAPI, authManager: authManager)
-    }
-    
-    public var productService: ProductService {
-        return ProductService(databaseAPI: databaseAPI, authManager: authManager)
-    }
-
 }

@@ -5,10 +5,15 @@
 //  Created by Christoph Rohde on 18.04.25.
 //
 
-@testable import Coffee_Kit
+import CoffeeKit
 import Foundation
 import OSLog
 import XCTest
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 public final class LoggerExtensionTests: XCTestCase {
     enum TestError: Error {

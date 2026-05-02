@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import FoundationKit
+import ProductKit
 
 public enum ImageServiceError: Error {
     case imageNotFound
@@ -15,7 +17,7 @@ public enum ImageServiceError: Error {
 public struct ImageService {
     private let imageUrl: URL
     private let urlSession: URLSession
-    private(set) var imageCache: Cache<String, Data>
+    public private(set) var imageCache: Cache<String, Data>
 
     public init(databaseAPI: borrowing DatabaseAPI) {
         let urlSessionConfiguration = URLSessionConfiguration.default
@@ -46,16 +48,15 @@ public struct ImageService {
 
     @concurrent
     @Sendable public func getImageData(for product: borrowing Product) async throws -> Data {
-        let newImageName = product.imageName.replacing(".png", with: ".heic")
+        let productImageUrl = product.imageUrl(relativeTo: imageUrl)
         
-        if let cachedImage = await imageCache.get(key: newImageName) {
+        if let cachedImage = await imageCache.get(key: productImageUrl.lastPathComponent) {
             return cachedImage
         }
 
-        let productImageUrl = await imageUrl / product.category / newImageName
         let imageData = try await fetchImageData(from: productImageUrl)
 
-        await imageCache.set(key: newImageName, value: imageData)
+        await imageCache.set(key: productImageUrl.lastPathComponent, value: imageData)
         return imageData
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FoundationKit
 
 
 @Observable public final class MenuManager {

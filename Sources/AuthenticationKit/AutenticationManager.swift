@@ -1,8 +1,8 @@
-
 import Foundation
+import FoundationKit
 
 
-public actor AutenticationManager {
+public actor AutenticationManager: Authenticating {
     private let keychain: KeychainService
     
     private let account = "currentUser"

@@ -5,9 +5,13 @@
 //  Created by Christoph Rohde on 20.10.24.
 //
 
-@testable import Coffee_Kit
 import Foundation
 import XCTest
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 final class Coffee_LoverTests: XCTestCase {
     func testDecodingProduct() throws {

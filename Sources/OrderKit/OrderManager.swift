@@ -7,6 +7,8 @@
 
 import Foundation
 import OSLog
+import FoundationKit
+import ProductKit
 
 @Observable
 public final class OrderManager {

@@ -7,7 +7,9 @@
 
 import Foundation
 import OSLog
-import Authentication_Kit
+import FoundationKit
+import ProductKit
+import AuthenticationKit
 
 public struct OrderService {
     // MARK: - Properties
@@ -19,7 +21,7 @@ public struct OrderService {
 
     // MARK: - Initializer
 
-    init(databaseAPI: borrowing DatabaseAPI, authManager: AutenticationManager? = nil) {
+    public init(databaseAPI: borrowing DatabaseAPI, authManager: AutenticationManager? = nil) {
         let urlSessionConfiguration = URLSessionConfiguration.default
         urlSessionConfiguration.timeoutIntervalForRequest = 14
 

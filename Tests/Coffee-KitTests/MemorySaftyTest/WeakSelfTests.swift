@@ -5,11 +5,15 @@
 //  Created by Christoph Rohde on 08.05.25.
 //
 
-@testable import Coffee_Kit
 import Foundation
 import Harmonize
 import OSLog
 import XCTest
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 final class WeakSelfTests: XCTestCase {
     let logger = Logger()
