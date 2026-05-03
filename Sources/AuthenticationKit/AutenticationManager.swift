@@ -2,17 +2,14 @@ import Foundation
 import FoundationKit
 
 
-public actor AutenticationManager: Authenticating {
+public actor AutenticationManager {
     private let keychain: KeychainService
     
     private let account = "currentUser"
     private let accessTokenService = "CoffeeLover.AccessToken"
     private let refreshTokenService = "CoffeeLover.RefreshToken"
     private let userService = "CoffeeLover.User"
-    
     private let baseURL: URL
-
-    // ARCHITECTURE TRICK: Hier speichern wir den aktuell laufenden Refresh-Call
     private var refreshTask: Task<String, Error>?
     
     public init(keychain: KeychainService, baseURL: URL) {
@@ -26,14 +23,13 @@ public actor AutenticationManager: Authenticating {
             return try await refreshSession()
         }
 
-        // JWT Validierung ohne try!
         do {
             let expired = try await JWTValidator.isExpired(token: currentToken)
             if !expired {
                 return currentToken
             }
         } catch {
-            print("⚠️ Token validation failed: \(error). Attempting refresh...")
+            print("Token validation failed: \(error). Attempting refresh...")
         }
         
         return try await refreshSession()
@@ -72,7 +68,7 @@ public actor AutenticationManager: Authenticating {
             let userDecoder = JSONDecoder()
             return try userDecoder.decode(User.self, from: data)
         } catch {
-            print("ℹ️ No user data found in keychain.")
+            print("No user data found in keychain.")
             return nil
         }
     }
@@ -83,9 +79,9 @@ public actor AutenticationManager: Authenticating {
             try await keychain.delete(account: account, service: accessTokenService)
             try await keychain.delete(account: account, service: refreshTokenService)
             try await keychain.delete(account: account, service: userService)
-            print("👤 User logged out and tokens/data cleared.")
+            print("User logged out and tokens/data cleared.")
         } catch {
-            print("⚠️ Error during logout: \(error)")
+            print("Error during logout: \(error)")
         }
     }
 
@@ -105,16 +101,16 @@ public actor AutenticationManager: Authenticating {
         do {
             _ = try await keychain.read(account: account, service: refreshTokenService)
         } catch {
-            print("ℹ️ No session active (Keychain error: \(error)). Skipping authentication header for \(request.url?.absoluteString ?? "unknown URL").")
+            print("No session active (Keychain error: \(error)). Skipping authentication header for \(request.url?.absoluteString ?? "unknown URL").")
             return
         }
         
         do {
             let token = try await getValidAccessToken()
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            print("✅ Added Authorization header to \(request.url?.absoluteString ?? "unknown URL").")
+            print("Added Authorization header to \(request.url?.absoluteString ?? "unknown URL").")
         } catch {
-            print("⚠️ Authentication failed for \(request.url?.absoluteString ?? "unknown URL"): \(error)")
+            print("Authentication failed for \(request.url?.absoluteString ?? "unknown URL"): \(error)")
         }
     }
 
@@ -122,7 +118,7 @@ public actor AutenticationManager: Authenticating {
     private func refreshSession() async throws -> String {
         
         if let existingTask = refreshTask {
-            print("⏳ Refresh already in progress. Attaching to the existing task...")
+            print("Refresh already in progress. Attaching to the existing task...")
             return try await existingTask.value
         }
         
@@ -143,7 +139,7 @@ public actor AutenticationManager: Authenticating {
             request.httpBody = try? JSONEncoder().encode(["refreshToken": refreshToken])
             
             do {
-                print("🚀 Sending refresh call to backend...")
+                print("Sending refresh call to backend...")
                 let (data, response) = try await URLSession.shared.data(for: request)
                 
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -158,7 +154,7 @@ public actor AutenticationManager: Authenticating {
                 
                 try await storeTokens(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)
                 
-                print("✅ Refresh successful! New Access Token stored.")
+                print("Refresh successful! New Access Token stored.")
                 return tokenResponse.accessToken
                 
             } catch let error as URLError {
