@@ -12,9 +12,9 @@ public actor AutenticationManager {
     private let baseURL: URL
     private var refreshTask: Task<String, Error>?
     
-    public init(keychain: KeychainService, baseURL: URL) {
+    public init(keychain: KeychainService, databaseAPI: DatabaseAPI) {
         self.keychain = keychain
-        self.baseURL = baseURL
+        self.baseURL = databaseAPI.baseURL / "authentication"
     }
     
     public func getValidAccessToken() async throws -> String {
