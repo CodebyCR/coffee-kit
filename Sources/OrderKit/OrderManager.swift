@@ -8,6 +8,7 @@
 import Foundation
 import OSLog
 import FoundationKit
+import AuthenticationKit
 import ProductKit
 
 @Observable
@@ -25,7 +26,7 @@ public final class OrderManager {
 
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
-        self.orderService = webservice.orderService
+        self.orderService = OrderService(webserviceProvider: webservice)
     }
     
     public var containsOrder: Bool {

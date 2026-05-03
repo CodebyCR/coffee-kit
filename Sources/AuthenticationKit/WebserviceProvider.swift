@@ -11,7 +11,10 @@ public struct WebserviceProvider {
     public let databaseAPI: DatabaseAPI
     public let autheticationManager: AutenticationManager
 
-    public init(inMode databaseAPI: consuming DatabaseAPI, autheticationManager: AutenticationManager) {
+    public init(
+        inMode databaseAPI: consuming DatabaseAPI,
+        autheticationManager: AutenticationManager
+    ) {
         self.databaseAPI = databaseAPI
         self.autheticationManager = autheticationManager
     }

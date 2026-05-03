@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import FoundationKit
+import AuthenticationKit
 
 
 @Observable public final class MenuManager {
@@ -20,14 +20,9 @@ import FoundationKit
 
     // MARK: - Initializer
 
-    public init() {
-        self.webservice = WebserviceProvider(inMode: .dev)
-        self.productService = ProductService(databaseAPI: webservice.databaseAPI)
-    }
-
     public init(from webservice: WebserviceProvider) {
         self.webservice = webservice
-        self.productService = webservice.productService
+        self.productService = ProductService(webserviceProvider: webservice)
     }
 
     // MARK: - Methods

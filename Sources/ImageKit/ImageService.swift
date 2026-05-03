@@ -7,6 +7,7 @@
 
 import Foundation
 import FoundationKit
+import AuthenticationKit
 import ProductKit
 
 public enum ImageServiceError: Error {

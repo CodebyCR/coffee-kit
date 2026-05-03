@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import FoundationKit
+import AuthenticationKit
 import ProductKit
 
 @Observable public final class ImageManager {

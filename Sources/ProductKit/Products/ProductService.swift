@@ -16,18 +16,18 @@ public struct ProductService {
     let productURL: URL
     let urlSession: URLSession
     private(set) var menuCache = Cache<String, Product>()
-    private let authManager: AutenticationManager?
+    private let authManager: AutenticationManager
 
     // MARK: Initializer
 
-    public init(databaseAPI: DatabaseAPI, authManager: AutenticationManager? = nil) {
+    public init(webserviceProvider: borrowing WebserviceProvider) {
         let urlSessionConfiguration = URLSessionConfiguration.default
 //        urlSessionConfiguration.timeoutIntervalForRequest = 14
 //        urlSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
 
         self.urlSession = URLSession(configuration: urlSessionConfiguration)
-        self.productURL = databaseAPI.baseURL / "coffee"
-        self.authManager = authManager
+        self.productURL = webserviceProvider.databaseAPI.baseURL / "coffee"
+        self.authManager = webserviceProvider.autheticationManager
         print(productURL)
     }
 
@@ -36,11 +36,7 @@ public struct ProductService {
     @Sendable public func getIds() async throws -> [String] {
         let productIdsUrl = productURL / "ids"
         var request = URLRequest(url: productIdsUrl)
-        
-        if let authManager = authManager {
-            await authManager.authenticate(&request)
-        }
-        
+        await authManager.authenticate(&request)
         let (data, response) = try await urlSession.data(for: request)
 
         guard let productIds = try? JSONDecoder().decode([String].self, from: data) else {
@@ -66,10 +62,7 @@ public struct ProductService {
         }
 
         var request = URLRequest(url: coffeeByIdUrl)
-        
-        if let authManager = authManager {
-            await authManager.authenticate(&request)
-        }
+        await authManager.authenticate(&request)
         
         let (data, response) = try await urlSession.data(for: request)
 
