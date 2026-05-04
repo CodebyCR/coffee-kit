@@ -20,26 +20,28 @@ final class OrderTests: XCTestCase {
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
 
     func testTakingOrder() async {
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
         
-            let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
-            let databaseAPI = DatabaseAPI.dev
-            let webservice = WebserviceProvider(inMode: databaseAPI)
-            let orderManager = OrderManager(from: webservice)
+        let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
+        let orderManager = OrderManager(from: webserviceProvider)
 
-            let orderBuilder = OrderBuilder(for: testUserId)
-            orderBuilder.addProduct(Product())
-            orderBuilder.addProduct(Product())
+        let orderBuilder = OrderBuilder(for: testUserId)
+        orderBuilder.addProduct(Product())
+        orderBuilder.addProduct(Product())
 
-            let result = orderManager.takeOrder(from: orderBuilder)
+        let result = orderManager.takeOrder(from: orderBuilder)
 
-            switch result {
-            case .success(let message):
-                print("Order result: \(message)")
-                XCTAssertEqual(message, "Your order will arrive soon.")
-            case .failure(let error):
-                print("Order failed with error: \(error)")
-                XCTAssertNoThrow(error)
-            }
+        switch result {
+        case .success(let message):
+            print("Order result: \(message)")
+            XCTAssertEqual(message, "Your order will arrive soon.")
+        case .failure(let error):
+            print("Order failed with error: \(error)")
+            XCTAssertNoThrow(error)
+        }
         
         // Delete test order
     }
@@ -81,11 +83,17 @@ final class OrderTests: XCTestCase {
     }
 
     func testFetchOrderById() async throws {
-        let orderIdString = "059621D5-C191-45A9-AB5B-B4B414E9DB17"
-        let orderId = UUID(uuidString: orderIdString)!
-        let databaseAPI = DatabaseAPI.dev
-        let webservice = WebserviceProvider(inMode: databaseAPI)
-        let orderService = OrderService(databaseAPI: webservice.databaseAPI)
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let orderService = OrderService(webserviceProvider: webserviceProvider)
+
+        // Create a new order first to ensure we have a valid ID
+        let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
+        let order = Order()
+        try await orderService.takeOrder(order)
+        let orderId = order.id
 
         // Warmup
         _ = try? await orderService.getOrder(by: orderId)
@@ -94,9 +102,9 @@ final class OrderTests: XCTestCase {
         let start = Date()
 
         for _ in 0 ..< 10 {
-            let order = try await orderService.getOrder(by: orderId)
-            XCTAssertNotNil(order, "Order should not be nil")
-            XCTAssertEqual(order.id, orderId, "Order ID should match")
+            let fetchedOrder = try await orderService.getOrder(by: orderId)
+            XCTAssertNotNil(fetchedOrder, "Order should not be nil")
+            XCTAssertEqual(fetchedOrder.id, orderId, "Order ID should match")
         }
 
         let duration = Date().timeIntervalSince(start)

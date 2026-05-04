@@ -5,7 +5,6 @@
 //  Created by Christoph Rohde on 18.04.25.
 //
 
-import CoffeeKit
 import Foundation
 import OSLog
 import XCTest
