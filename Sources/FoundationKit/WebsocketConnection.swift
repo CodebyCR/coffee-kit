@@ -96,7 +96,7 @@ public struct WebsocketConnection: Sendable {
         }
     }
 
-    func close() {
+    public func close() {
         webSocketTask.cancel(with: .normalClosure, reason: nil)
     }
 }

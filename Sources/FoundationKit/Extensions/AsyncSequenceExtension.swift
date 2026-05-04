@@ -11,7 +11,7 @@ import Foundation
 
 
 
-extension AsyncSequence {
+public extension AsyncSequence {
     func collect<C: RangeReplaceableCollection>(
         into initialValue: C = C()
     ) async throws -> C where C.Element == Element {

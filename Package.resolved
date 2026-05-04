@@ -1,22 +1,13 @@
 {
-  "originHash" : "1c76daf8512f795aeae2b70e86a3eb59775052746b038b6f4ae27b0a910cdbc9",
+  "originHash" : "a48f514a2d67223cc528eabf3c815eb59669fa7009d38ebd8fa8e40a7002daed",
   "pins" : [
     {
       "identity" : "harmonize",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/perrystreetsoftware/Harmonize.git",
       "state" : {
-        "revision" : "e8d20b57d4b77bdc80e6fbf2ac182fc704771050",
-        "version" : "0.1.0"
-      }
-    },
-    {
-      "identity" : "swift-collections",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections.git",
-      "state" : {
-        "revision" : "6675bc0ff86e61436e615df6fc5174e043e57924",
-        "version" : "1.4.1"
+        "revision" : "1279fbf4d87c9b9bd230e91911194145959e6d54",
+        "version" : "0.9.0"
       }
     },
     {
@@ -24,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+        "version" : "601.0.1"
       }
     },
     {

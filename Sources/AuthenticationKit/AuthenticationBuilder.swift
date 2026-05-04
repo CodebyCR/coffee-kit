@@ -1,5 +1,6 @@
 
 import Foundation
+import FoundationKit
 
 
 public enum CredentialDenyReason {
@@ -52,11 +53,10 @@ public final class AuthenticationBuilder {
     @ObservationIgnored private let session = URLSession.shared
 
     public init(
-        authManager: AutenticationManager,
-        baseURL: URL
+        webserviceProvider: WebserviceProvider
     ) {
-        self.authManager = authManager
-        self.baseURL = baseURL
+        self.authManager = webserviceProvider.autheticationManager
+        self.baseURL = webserviceProvider.databaseAPI.baseURL / "authentication"
     }
 
     public var isValidEmail: CredentialState {

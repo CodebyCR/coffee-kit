@@ -18,7 +18,7 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
     private let memoryLimit: Int
 
     /// The current size of the cache in bytes.
-    private(set) var memoryUsage: Int
+    public private(set) var memoryUsage: Int
 
     /// The cache dictionary.
     private(set) var cache: [Key: Value]

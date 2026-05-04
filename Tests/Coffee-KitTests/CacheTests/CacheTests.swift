@@ -5,11 +5,16 @@
 //  Created by Christoph Rohde on 16.05.25.
 //
 
-@testable import Coffee_Kit
 import Foundation
 import XCTest
 import OSLog
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
+@MainActor
 final class CacheTests: XCTestCase {
     
     private let log = Logger(subsystem: "Coffee-Kit Tests", category: "CacheTests")
@@ -29,7 +34,12 @@ final class CacheTests: XCTestCase {
     // MARK: - Properties
 
     func testCaching() async throws {
-        let productService = await ProductService(databaseAPI: .dev)
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
         let cache = Cache<String, Product>(memoryLimitInMB: 200)
         let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 
@@ -51,7 +61,12 @@ final class CacheTests: XCTestCase {
     }
 
     func testCacheMemoryLimit() async throws {
-        let productService = await ProductService(databaseAPI: .dev)
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
         let cache = Cache<String, Product>()
 
         for id in ids { // FIX memorie limit
@@ -70,7 +85,12 @@ final class CacheTests: XCTestCase {
     }
 
     func testCacheInitilisationWithKeyList() async throws {
-        let productService = await ProductService(databaseAPI: .dev)
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
 
         guard let productCache = try? await Cache.create(by: ids, with: productService.load)
         else {
@@ -90,8 +110,14 @@ final class CacheTests: XCTestCase {
     }
 
     func testDataCaching() async throws {
-        let imageService = await ImageService(databaseAPI: .dev)
-        let imageCache = await imageService.imageCache
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+    
+        let imageService = ImageService(databaseAPI: webserviceProvider.databaseAPI)
+        let imageCache = imageService.imageCache
         let testProduct = Product()
 
         let data = try await imageService.getImageData(for: testProduct)
@@ -102,8 +128,13 @@ final class CacheTests: XCTestCase {
     }
     
     
-    func testFetchingPerformance() async {
-        let productService = await ProductService(databaseAPI: .dev)
+    func testFetchingPerformance() async throws {
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
         let cache = Cache<String, Product>(memoryLimitInMB: 50)
         let ids = try! await productService.getIds()
         let measureOptions = XCTMeasureOptions()

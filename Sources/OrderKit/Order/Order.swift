@@ -5,6 +5,7 @@
 //  Created by Christoph Rohde on 04.12.24.
 //
 import Foundation
+import ProductKit
 
 nonisolated public struct Order {
     public let id: UUID

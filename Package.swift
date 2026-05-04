@@ -10,29 +10,89 @@ let package = Package(
         .macOS(.v14),
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Coffee-Kit",
-            targets: ["Coffee-Kit"]
+            name: "FoundationKit",
+            targets: ["FoundationKit"]
         ),
         .library(
-            name: "Authentication-Kit",
-            targets: ["Authentication-Kit"]
+            name: "AuthenticationKit",
+            targets: ["AuthenticationKit"]
         ),
+        .library(
+            name: "ImageKit",
+            targets: ["ImageKit"]
+        ),
+        .library(
+            name: "OrderKit",
+            targets: ["OrderKit"]
+        ),
+        .library(
+            name: "ProductKit",
+            targets: ["ProductKit"]
+        )
     ],
     dependencies: [
         .package(
             url: "https://github.com/perrystreetsoftware/Harmonize.git",
-            from: "0.1.0"
+            from: "0.9.0"
         )
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Coffee-Kit",
+            name: "FoundationKit",
+            dependencies: [],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
+            ]
+        ),
+        .target(
+            name: "AuthenticationKit",
             dependencies: [
-                "Authentication-Kit"
+                "FoundationKit"
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
+            ]
+        ),
+        .target(
+            name: "ProductKit",
+            dependencies: [
+                "FoundationKit",
+                "AuthenticationKit"
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
+            ]
+        ),
+        .target(
+            name: "OrderKit",
+            dependencies: [
+                "FoundationKit",
+                "AuthenticationKit",
+                "ProductKit"
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
+            ]
+        ),
+        .target(
+            name: "ImageKit",
+            dependencies: [
+                "FoundationKit",
+                "AuthenticationKit",
+                "ProductKit"
             ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency"),
@@ -44,21 +104,13 @@ let package = Package(
         .testTarget(
             name: "Coffee-KitTests",
             dependencies: [
-                "Coffee-Kit",
+                "FoundationKit",
+                "AuthenticationKit",
+                "ProductKit",
+                "OrderKit",
+                "ImageKit",
                 .product(name: "Harmonize", package: "Harmonize"),
             ]
         ),
-        
-        .target(
-            name: "Authentication-Kit",
-            dependencies: [
-            ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
-        )
     ]
 )

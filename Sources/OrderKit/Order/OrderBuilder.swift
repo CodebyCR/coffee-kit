@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ProductKit
 
 @Observable public class OrderBuilder {
     // MARK: - Properties

@@ -7,8 +7,11 @@
 
 import Foundation
 import XCTest
-@testable import Coffee_Kit
-
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class ProductServiceTests: XCTestCase {
@@ -16,12 +19,20 @@ final class ProductServiceTests: XCTestCase {
     // MARK: - Properties
 
 #if DEBUG
-    let productService = ProductService(databaseAPI: .dev)
 
 
 
 
-    func testLoadAllIds() async {
+
+    func testLoadAllIds() async throws {
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
+        
+        
         guard let ids = try? await productService
             .getIds()
 
@@ -34,7 +45,14 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertFalse(ids.isEmpty, "Product IDs should not be empty")
     }
 
-    func testFetchProductById() async {
+    func testFetchProductById() async throws {
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
+        
         let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 
         guard let product = try? await productService
@@ -50,7 +68,14 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(product.name, "Cappuccino", "Product ID should match")
     }
 
-    func testFetchAllProducts() async {
+    func testFetchAllProducts() async throws {
+        try skipUnlessAPITestsEnabled()
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let productService = ProductService(webserviceProvider: webserviceProvider)
+        
         guard let products = try? await productService
             .loadAll()
             .collect(into: [Result<Product, Error>]())

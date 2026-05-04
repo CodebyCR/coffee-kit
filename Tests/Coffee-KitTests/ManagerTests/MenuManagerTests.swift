@@ -7,14 +7,23 @@
 
 import Foundation
 import XCTest
-
-@testable import Coffee_Kit
+import FoundationKit
+import AuthenticationKit
+import ProductKit
+import OrderKit
+import ImageKit
 
 @MainActor
 final class MenuManagerTests: XCTestCase {
-    let menuManager = MenuManager(from: WebserviceProvider(inMode: .dev))
 
-    func testItemSequence() {
+    func testItemSequence() throws {
+        try skipUnlessAPITestsEnabled()
+        
+        let keychain = DefaultKeychainManager()
+        let databaseAPI: DatabaseAPI = .dev
+        let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
+        let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
+        let menuManager = MenuManager(from: webserviceProvider)
         let itemSequence = menuManager.productService
         XCTAssertNotNil(itemSequence)
     }

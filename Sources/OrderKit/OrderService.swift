@@ -7,7 +7,9 @@
 
 import Foundation
 import OSLog
-import Authentication_Kit
+import FoundationKit
+import ProductKit
+import AuthenticationKit
 
 public struct OrderService {
     // MARK: - Properties
@@ -15,17 +17,17 @@ public struct OrderService {
     private let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderService")
     private let orderUrl: URL
     private let urlSession: URLSession
-    private let authManager: AutenticationManager?
+    private let authManager: AutenticationManager
 
     // MARK: - Initializer
 
-    init(databaseAPI: borrowing DatabaseAPI, authManager: AutenticationManager? = nil) {
+    public init(webserviceProvider: borrowing WebserviceProvider) {
         let urlSessionConfiguration = URLSessionConfiguration.default
         urlSessionConfiguration.timeoutIntervalForRequest = 14
 
         self.urlSession = URLSession(configuration: urlSessionConfiguration)
-        self.orderUrl = databaseAPI.baseURL / "order"
-        self.authManager = authManager
+        self.orderUrl = webserviceProvider.databaseAPI.baseURL / "order"
+        self.authManager = webserviceProvider.autheticationManager
     }
 
     // MARK: - Methods
@@ -38,10 +40,7 @@ public struct OrderService {
         request.httpBody = requestData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Authentication
-        if let authManager = authManager {
-            await authManager.authenticate(&request)
-        }
+        await authManager.authenticate(&request)
 
         logger.debug("Post to \(createOrderURL)")
 
@@ -66,11 +65,8 @@ public struct OrderService {
     public func getOrder(by id: UUID) async throws -> Order {
         let orderByIdUrl = orderUrl / "id" / "\(id)"
         var request = URLRequest(url: orderByIdUrl)
-        
-        // Authentication
-        if let authManager = authManager {
-            await authManager.authenticate(&request)
-        }
+
+        await authManager.authenticate(&request)
         
         let (data, response) = try await urlSession.data(for: request)
 
@@ -103,11 +99,8 @@ public struct OrderService {
         let unixTimestamp = Int(lastOrderDate.timeIntervalSince1970)
         let orderHistoryUrl = orderUrl / "history" / "\(unixTimestamp)"
         var request = URLRequest(url: orderHistoryUrl)
-        
-        // Authentication
-        if let authManager = authManager {
-            await authManager.authenticate(&request)
-        }
+
+        await authManager.authenticate(&request)
         
         let (data, response) = try await urlSession.data(for: request)
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ProductKit
 
 @Observable
 public final class OrderProduct { // shold be @Observable and non sendable

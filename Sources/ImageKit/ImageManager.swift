@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import AuthenticationKit
+import ProductKit
 
 @Observable public final class ImageManager {
     // MARK: - Properties
