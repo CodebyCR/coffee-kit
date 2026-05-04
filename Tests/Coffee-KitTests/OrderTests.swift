@@ -19,7 +19,8 @@ import ImageKit
 final class OrderTests: XCTestCase {
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
 
-    func testTakingOrder() async {
+    func testTakingOrder() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -83,6 +84,7 @@ final class OrderTests: XCTestCase {
     }
 
     func testFetchOrderById() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)

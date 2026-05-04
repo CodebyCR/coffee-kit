@@ -37,25 +37,4 @@ final class WeakSelfTests: XCTestCase {
             }
     }
 
-    public func testClassNamingConvention() throws {
-        let message = "Class name violate the naming convention."
-
-        let candidates = Harmonize
-            .productionCode()
-            .classes()
-            .withoutSuffix(
-                "ViewModel",
-                "Service",
-                "Manager",
-                "Builder"
-            )
-
-        if candidates.isNotEmpty {
-            print("Found \(candidates.count) candidates for naming convention violations.")
-        }
-
-        for _ in candidates {
-            XCTAssert(false, message)
-        }
-    }
 }

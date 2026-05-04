@@ -16,6 +16,7 @@ import ImageKit
 @MainActor
 final class WebsocketConnectionTest: XCTestCase {
     func testWebsocketConnectionOrderStatus() async throws {
+        try skipUnlessAPITestsEnabled()
         let url = URL(string: "ws://127.0.0.1:8080/test/order/status/123")!
         print("Connecting to WebSocket at '\(url)'...")
         let connection = try WebsocketConnection(url: url)

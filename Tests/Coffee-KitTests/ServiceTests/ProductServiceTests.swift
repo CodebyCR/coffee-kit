@@ -24,7 +24,8 @@ final class ProductServiceTests: XCTestCase {
 
 
 
-    func testLoadAllIds() async {
+    func testLoadAllIds() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -44,7 +45,8 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertFalse(ids.isEmpty, "Product IDs should not be empty")
     }
 
-    func testFetchProductById() async {
+    func testFetchProductById() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -66,7 +68,8 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(product.name, "Cappuccino", "Product ID should match")
     }
 
-    func testFetchAllProducts() async {
+    func testFetchAllProducts() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)

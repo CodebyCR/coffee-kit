@@ -34,6 +34,7 @@ final class CacheTests: XCTestCase {
     // MARK: - Properties
 
     func testCaching() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -60,6 +61,7 @@ final class CacheTests: XCTestCase {
     }
 
     func testCacheMemoryLimit() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -83,6 +85,7 @@ final class CacheTests: XCTestCase {
     }
 
     func testCacheInitilisationWithKeyList() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -107,6 +110,7 @@ final class CacheTests: XCTestCase {
     }
 
     func testDataCaching() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -124,7 +128,8 @@ final class CacheTests: XCTestCase {
     }
     
     
-    func testFetchingPerformance() async {
+    func testFetchingPerformance() async throws {
+        try skipUnlessAPITestsEnabled()
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
