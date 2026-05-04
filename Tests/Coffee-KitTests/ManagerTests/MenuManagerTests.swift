@@ -16,7 +16,9 @@ import ImageKit
 @MainActor
 final class MenuManagerTests: XCTestCase {
 
-    func testItemSequence() {
+    func testItemSequence() throws {
+        try skipUnlessAPITestsEnabled()
+        
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
