@@ -3,16 +3,16 @@ import FoundationKit
 
 
 public actor AutenticationManager {
-    private let keychain: KeychainService
+    private let keychain: any KeychainService
     
     private let account = "currentUser"
     private let accessTokenService = "CoffeeLover.AccessToken"
     private let refreshTokenService = "CoffeeLover.RefreshToken"
     private let userService = "CoffeeLover.User"
     private let baseURL: URL
-    private var refreshTask: Task<String, Error>?
+    private var refreshTask: Task<String, any Error>?
     
-    public init(keychain: KeychainService, databaseAPI: DatabaseAPI) {
+    public init(keychain: any KeychainService, databaseAPI: DatabaseAPI) {
         self.keychain = keychain
         self.baseURL = databaseAPI.baseURL / "authentication"
     }
@@ -122,7 +122,7 @@ public actor AutenticationManager {
             return try await existingTask.value
         }
         
-        let task = Task<String, Error> {
+        let task = Task<String, any Error> {
             
             let refreshTokenData: Data
             do {

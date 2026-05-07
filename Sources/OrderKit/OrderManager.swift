@@ -33,7 +33,7 @@ public final class OrderManager {
         return pendingOrderId != nil
     }
 
-    public func takeOrder(from orderBuilder: OrderBuilder) -> Result<String, Error> {
+    public func takeOrder(from orderBuilder: OrderBuilder) -> Result<String, any Error> {
         logger.info("Ordering...")
 
         do {
@@ -62,7 +62,7 @@ public final class OrderManager {
         }
     }
 
-    public func getRealTimeOrderStatus(by id: String) throws -> AsyncThrowingStream<URLSessionWebSocketTask.Message, Error> {
+    public func getRealTimeOrderStatus(by id: String) throws -> AsyncThrowingStream<URLSessionWebSocketTask.Message, any Error> {
         guard !id.isEmpty else {
             throw FetchError.invalidRequest
         }

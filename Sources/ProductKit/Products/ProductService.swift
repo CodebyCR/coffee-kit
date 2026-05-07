@@ -93,8 +93,8 @@ public struct ProductService {
         return product
     }
 
-    @Sendable public func load(by ids: [String]) async -> AsyncThrowingStream<Product, Error> {
-        return AsyncThrowingStream<Product, Error> { continuation in
+    @Sendable public func load(by ids: [String]) async -> AsyncThrowingStream<Product, any Error> {
+        return AsyncThrowingStream<Product, any Error> { continuation in
             Task {
                 do {
                     for id in ids {
@@ -110,8 +110,8 @@ public struct ProductService {
     }
 
 
-    @Sendable public func loadAll() async -> AsyncStream<Result<Product, Error>> {
-        return AsyncStream<Result<Product, Error>> { continuation in
+    @Sendable public func loadAll() async -> AsyncStream<Result<Product, any Error>> {
+        return AsyncStream<Result<Product, any Error>> { continuation in
             Task(priority: .userInitiated) {
                 do {
                     let ids = try await getIds()

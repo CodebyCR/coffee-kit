@@ -63,7 +63,7 @@ public struct WebsocketConnection: Sendable {
     }
 
     // Continuous stream of messages; finishes on close or error; respects cancellation
-    public func receive() -> AsyncThrowingStream<URLSessionWebSocketTask.Message, Error> {
+    public func receive() -> AsyncThrowingStream<URLSessionWebSocketTask.Message, any Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 while !Task.isCancelled {

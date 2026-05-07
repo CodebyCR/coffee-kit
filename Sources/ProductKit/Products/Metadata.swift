@@ -23,7 +23,7 @@ nonisolated public struct Metadata: Sendable, Codable, Hashable, CustomDebugStri
         updatedAt = Date()
     }
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let createdAtTimeinterval = try? container.decode(TimeInterval.self, forKey: .createdAt)
         createdAt = Date(timeIntervalSince1970: createdAtTimeinterval ?? Date.now.timeIntervalSince1970)
@@ -31,7 +31,7 @@ nonisolated public struct Metadata: Sendable, Codable, Hashable, CustomDebugStri
         updatedAt = Date(timeIntervalSince1970: updatedAtTimeinterval ?? Date.now.timeIntervalSince1970)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(createdAt.timeIntervalSince1970, forKey: .createdAt)
         try container.encode(updatedAt.timeIntervalSince1970, forKey: .updatedAt)

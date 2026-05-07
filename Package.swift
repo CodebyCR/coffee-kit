@@ -3,6 +3,24 @@
 
 import PackageDescription
 
+
+let swiftSettings: [SwiftSetting] = [
+    .enableExperimentalFeature("StrictConcurrency"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+    .enableUpcomingFeature("InferIsolatedConformances"),
+    .enableUpcomingFeature("ImplicitSelfCapture"),
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+    .enableUpcomingFeature("FullTypedThrows"),
+    .unsafeFlags([
+        "-Xfrontend", "-warn-long-function-bodies=30",
+        "-Xfrontend", "-warn-long-expression-type-checking=13",
+        "-Xfrontend", "-strict-concurrency=complete",
+        "-warnings-as-errors"
+    ]),
+    .defaultIsolation(MainActor.self)
+]
+
 let package = Package(
     name: "Coffee-Kit",
     platforms: [
@@ -41,24 +59,14 @@ let package = Package(
         .target(
             name: "FoundationKit",
             dependencies: [],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "AuthenticationKit",
             dependencies: [
                 "FoundationKit"
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "ProductKit",
@@ -66,12 +74,7 @@ let package = Package(
                 "FoundationKit",
                 "AuthenticationKit"
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "OrderKit",
@@ -80,12 +83,7 @@ let package = Package(
                 "AuthenticationKit",
                 "ProductKit"
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "ImageKit",
@@ -94,12 +92,7 @@ let package = Package(
                 "AuthenticationKit",
                 "ProductKit"
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency"),
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("InferIsolatedConformances"),
-                .defaultIsolation(MainActor.self)
-            ]
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "Coffee-KitTests",
@@ -112,5 +105,6 @@ let package = Package(
                 .product(name: "Harmonize", package: "Harmonize"),
             ]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )
