@@ -92,7 +92,6 @@ final class OrderTests: XCTestCase {
         let orderService = OrderService(webserviceProvider: webserviceProvider)
 
         // Create a new order first to ensure we have a valid ID
-        let testUserId = UUID(uuidString: "03F35975-AF57-4691-811F-4AB872FDB51B")!
         let order = Order()
         try await orderService.takeOrder(order)
         let orderId = order.id

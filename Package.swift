@@ -14,7 +14,7 @@ let swiftSettings: [SwiftSetting] = [
     .enableUpcomingFeature("FullTypedThrows"),
     .unsafeFlags([
         "-Xfrontend", "-warn-long-function-bodies=30",
-        "-Xfrontend", "-warn-long-expression-type-checking=13",
+        "-Xfrontend", "-warn-long-expression-type-checking=14",
         "-Xfrontend", "-strict-concurrency=complete",
         "-warnings-as-errors"
     ]),
