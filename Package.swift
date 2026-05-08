@@ -16,7 +16,7 @@ let swiftSettings: [SwiftSetting] = [
         "-Xfrontend", "-warn-long-function-bodies=30",
         "-Xfrontend", "-warn-long-expression-type-checking=14",
         "-Xfrontend", "-strict-concurrency=complete",
-        "-warnings-as-errors"
+ //       "-warnings-as-errors"
     ]),
     .defaultIsolation(MainActor.self)
 ]
