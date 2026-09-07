@@ -29,7 +29,10 @@ import AuthenticationKit
 
     public func getSelection(for category: MenuCategory) -> [Product] {
         let lookupUpCategory: String = category.rawValue.lowercased()
-        return items.filter { $0.category == lookupUpCategory }
+        let filteredItems = items.filter { product in
+            return product.category == lookupUpCategory
+        }
+        return filteredItems
     }
     
 

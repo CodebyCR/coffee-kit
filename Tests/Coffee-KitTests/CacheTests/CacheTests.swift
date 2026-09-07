@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 import OSLog
 import FoundationKit
 import AuthenticationKit
@@ -14,8 +14,9 @@ import ProductKit
 import OrderKit
 import ImageKit
 
+@Suite("Cache Tests")
 @MainActor
-final class CacheTests: XCTestCase {
+struct CacheTests {
     
     private let log = Logger(subsystem: "Coffee-Kit Tests", category: "CacheTests")
     private let ids = ["e074867a-0c6a-49ff-87ca-b1ba5dae5236",
@@ -31,10 +32,8 @@ final class CacheTests: XCTestCase {
                        "c4adb030-0863-481d-ba7c-68b404607b84",
                        "f336aa07-fbba-4a79-9c7a-8c58031eef99"]
 
-    // MARK: - Properties
-
-    func testCaching() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Test product caching", .requiresAPI)
+    func caching() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -45,7 +44,7 @@ final class CacheTests: XCTestCase {
 
         guard let _ = try? await cache.fetch(key: cappuccinoId, with: productService.load)
         else {
-            XCTFail("Failed to fetch product")
+            Issue.record("Failed to fetch product")
             return
         }
 
@@ -54,14 +53,15 @@ final class CacheTests: XCTestCase {
 
         guard let cappuccino = await cache.get(key: cappuccinoId)
         else {
-            XCTFail("Failed to fetch product from cache")
+            Issue.record("Failed to fetch product from cache")
             return
         }
-        XCTAssertNotNil(cappuccino, "Product should be cached")
+        #expect(isCached, "Product should be cached")
+        #expect(cappuccino.id.uuidString.lowercased() == cappuccinoId, "Cached product should be the requested one")
     }
 
-    func testCacheMemoryLimit() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Test cache memory limit", .requiresAPI)
+    func cacheMemoryLimit() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -69,10 +69,10 @@ final class CacheTests: XCTestCase {
         let productService = ProductService(webserviceProvider: webserviceProvider)
         let cache = Cache<String, Product>()
 
-        for id in ids { // FIX memorie limit
+        for id in ids {
             guard let _ = try? await cache.fetch(key: id, with: productService.load)
             else {
-                XCTFail("Failed to fetch product")
+                Issue.record("Failed to fetch product")
                 return
             }
 
@@ -84,8 +84,8 @@ final class CacheTests: XCTestCase {
         }
     }
 
-    func testCacheInitilisationWithKeyList() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Test cache initialization with key list", .requiresAPI)
+    func cacheInitialisationWithKeyList() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -94,23 +94,23 @@ final class CacheTests: XCTestCase {
 
         guard let productCache = try? await Cache.create(by: ids, with: productService.load)
         else {
-            XCTFail("Failed to fetch product")
+            Issue.record("Failed to fetch product")
             return
         }
 
         let isCached = await productCache.contains(key: ids[0])
-        XCTAssertTrue(isCached, "Product should be cached")
+        #expect(isCached, "Product should be cached")
 
         let product = await productCache.get(key: ids[0])
-        XCTAssertNotNil(product, "Product should be cached")
+        #expect(product != nil, "Product should be cached")
 
         let count = await productCache.count
         print("Cached products: \(count)")
-        XCTAssertEqual(count, ids.count, "All products should be cached")
+        #expect(count == ids.count, "All products should be cached")
     }
 
-    func testDataCaching() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Test data caching", .requiresAPI)
+    func dataCaching() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -121,43 +121,32 @@ final class CacheTests: XCTestCase {
         let testProduct = Product()
 
         let data = try await imageService.getImageData(for: testProduct)
-        XCTAssertNotNil(data, "Image data should not be nil")
+        #expect(!data.isEmpty, "Image data should not be empty")
 
         let cachedData = await imageCache.get(key: testProduct.imageName)
-        XCTAssertNotNil(cachedData, "Cached image data should not be nil")
+        #expect(cachedData != nil, "Cached image data should not be nil")
     }
     
-    
-    func testFetchingPerformance() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Test fetching performance", .requiresAPI)
+    func fetchingPerformance() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
         let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
         let productService = ProductService(webserviceProvider: webserviceProvider)
         let cache = Cache<String, Product>(memoryLimitInMB: 50)
-        let ids = try! await productService.getIds()
-        let measureOptions = XCTMeasureOptions()
-        measureOptions.iterationCount = 10
-    
-        measure(metrics: [XCTApplicationLaunchMetric()], options: measureOptions) {
-            let exp = expectation(description: "Fetch all")
-            Task(name: "Featch Products into Cache") {
-                for id in ids {
-                    _ = try? await cache.fetch(key: id, with: productService.load)
-                }
-                // Optional: prüfe hier den Zustand
-//                 let count = await cache.count
-//                 XCTAssertEqual(count, ids.count)
-                
-                exp.fulfill()
-            }
-            
-            wait(for: [exp], timeout: 1.0)
+        let ids = try await productService.getIds()
+        
+        // Manual timing as a replacement for XCTMeasure
+        let start = Date()
+        
+        for id in ids {
+            _ = try? await cache.fetch(key: id, with: productService.load)
         }
+        
+        let duration = Date().timeIntervalSince(start)
         let count = await cache.count
-        log.info("Fetched all products, cache size: \(count)")
-
+        log.info("Fetched \(count) products in \(duration) seconds, cache size: \(count)")
+        #expect(count == ids.count, "All products should be fetched")
     }
-    
 }

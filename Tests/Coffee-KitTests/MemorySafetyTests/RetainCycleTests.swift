@@ -7,14 +7,13 @@
 
 import Foundation
 import Harmonize
-import XCTest
+import Testing
 
-/// Tests to ensure memory safety and prevent retain cycles in the Coffee-Kit project.
-final class RetainCycleTests: XCTestCase {
+@Suite("Retain Cycle Tests")
+struct RetainCycleTests {
     
-    /// Verifies that all closures within classes that reference 'self' do so weakly.
-    /// This prevents common retain cycles where a class instance captures itself strongly in an escaping closure.
-    func testClosuresShouldCaptureSelfWeaklyToPreventRetainCycles() throws {
+    @Test("Closures should capture 'self' weakly to prevent retain cycles")
+    func closuresShouldCaptureSelfWeaklyToPreventRetainCycles() throws {
         // Scan the production code for potential memory leaks
         Harmonize.productionCode()
             .classes()

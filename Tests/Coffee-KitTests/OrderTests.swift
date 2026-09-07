@@ -8,19 +8,21 @@
 import Combine
 import Foundation
 import OSLog
-import XCTest
+import Testing
 import FoundationKit
 import AuthenticationKit
 import ProductKit
 import OrderKit
 import ImageKit
 
+@Suite("Order Tests")
 @MainActor
-final class OrderTests: XCTestCase {
+struct OrderTests {
     let logger = Logger(subsystem: "com.CodebyCR.coffeeKit", category: "OrderTests")
-
-    func testTakingOrder() async throws {
-        try skipUnlessAPITestsEnabled()
+    
+    @Test("Taking an order", .requiresAPI)
+    func takingOrder() async throws {
+        
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -38,16 +40,17 @@ final class OrderTests: XCTestCase {
         switch result {
         case .success(let message):
             print("Order result: \(message)")
-            XCTAssertEqual(message, "Your order will arrive soon.")
+            #expect(message == "Your order will arrive soon.")
         case .failure(let error):
             print("Order failed with error: \(error)")
-            XCTAssertNoThrow(error)
+            Issue.record("Order failed: \(error)")
         }
         
         // Delete test order
     }
 
-    func testDecodeOrder() throws {
+    @Test("Decoding an order from JSON")
+    func decodeOrder() throws {
         let orderJson = """
         {
             "user_id": "03F35975-AF57-4691-811F-4AB872FDB51B",
@@ -78,13 +81,14 @@ final class OrderTests: XCTestCase {
         """
 
         let jsonData = orderJson.data(using: .utf8)!
-        let order = try! JSONDecoder().decode(Order.self, from: jsonData)
+        let order = try JSONDecoder().decode(Order.self, from: jsonData)
 
-        XCTAssertEqual(order.id, UUID(uuidString: "611C357B-50B7-4773-9D7A-BB3349975C9D"))
+        #expect(order.id == UUID(uuidString: "611C357B-50B7-4773-9D7A-BB3349975C9D"))
     }
 
-    func testFetchOrderById() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Fetching an order by ID", .requiresAPI)
+    func fetchOrderById() async throws {
+        
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -104,8 +108,7 @@ final class OrderTests: XCTestCase {
 
         for _ in 0 ..< 10 {
             let fetchedOrder = try await orderService.getOrder(by: orderId)
-            XCTAssertNotNil(fetchedOrder, "Order should not be nil")
-            XCTAssertEqual(fetchedOrder.id, orderId, "Order ID should match")
+            #expect(fetchedOrder.id == orderId, "Order ID should match")
         }
 
         let duration = Date().timeIntervalSince(start)

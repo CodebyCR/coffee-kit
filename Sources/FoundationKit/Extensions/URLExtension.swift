@@ -30,7 +30,7 @@ public extension URL {
     /// - Precondition: The URL must be valid
     /// - Postcondition: The URL is appended with the path
 
-    static func / (lhs: consuming URL, rhs: consuming String) -> URL {
+    nonisolated static func / (lhs: consuming URL, rhs: consuming String) -> URL {
         return lhs.appendingPathComponent(rhs)
     }
 

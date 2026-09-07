@@ -1,52 +1,42 @@
 //
-//  File.swift
+//  ProductServiceTests.swift
 //  Coffee-Kit
 //
 //  Created by Christoph Rohde on 15.05.25.
 //
 
 import Foundation
-import XCTest
+import Testing
 import FoundationKit
 import AuthenticationKit
 import ProductKit
 import OrderKit
 import ImageKit
 
+@Suite("Product Service Tests")
 @MainActor
-final class ProductServiceTests: XCTestCase {
-
-    // MARK: - Properties
+struct ProductServiceTests {
 
 #if DEBUG
-
-
-
-
-
-    func testLoadAllIds() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Load all product IDs", .requiresAPI)
+    func loadAllIds() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
         let webserviceProvider = WebserviceProvider(inMode: databaseAPI, autheticationManager: authenticationManager)
         let productService = ProductService(webserviceProvider: webserviceProvider)
         
-        
-        guard let ids = try? await productService
-            .getIds()
-
-        else {
-            XCTFail("Failed to fetch product IDs")
+        guard let ids = try? await productService.getIds() else {
+            Issue.record("Failed to fetch product IDs")
             return
         }
 
         print("Fetched product IDs: \(ids)")
-        XCTAssertFalse(ids.isEmpty, "Product IDs should not be empty")
+        #expect(!ids.isEmpty, "Product IDs should not be empty")
     }
 
-    func testFetchProductById() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Fetch product by ID", .requiresAPI)
+    func fetchProductById() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -55,21 +45,18 @@ final class ProductServiceTests: XCTestCase {
         
         let cappuccinoId = "01dc289a-4bb0-407c-b5a6-a6a868ab0101"
 
-        guard let product = try? await productService
-            .load(by: cappuccinoId)
-        else {
-            XCTFail("Failed to fetch product")
+        guard let product = try? await productService.load(by: cappuccinoId) else {
+            Issue.record("Failed to fetch product")
             return
         }
 
         print("Fetched product: \(product)")
 
-        XCTAssertNotNil(product, "Product should not be nil")
-        XCTAssertEqual(product.name, "Cappuccino", "Product ID should match")
+        #expect(product.name == "Cappuccino", "Product name should match")
     }
 
-    func testFetchAllProducts() async throws {
-        try skipUnlessAPITestsEnabled()
+    @Test("Fetch all products", .requiresAPI)
+    func fetchAllProducts() async throws {
         let keychain = DefaultKeychainManager()
         let databaseAPI: DatabaseAPI = .dev
         let authenticationManager = AutenticationManager(keychain: keychain, databaseAPI: databaseAPI)
@@ -80,32 +67,14 @@ final class ProductServiceTests: XCTestCase {
             .loadAll()
             .collect(into: [Result<Product, Error>]())
         else {
-            XCTFail("Failed to fetch products")
+            Issue.record("Failed to fetch products")
             return
         }
 
         let successProducts: [Product] = products.compactMap { try? $0.get() }
         print("Fetched product count: \(successProducts.count)")
-        print(successProducts)
 
-        XCTAssertFalse(successProducts.isEmpty, "Products should not be empty")
+        #expect(!successProducts.isEmpty, "Products should not be empty")
     }
-
-//    func testFetchAllProductsConccurent() async {
-//        guard let ids = try? await productService
-//            .getIds()
-//        else {
-//            XCTFail("Failed to fetch product IDs")
-//            return
-//        }
-//
-//        let products = ids.compactMap { productId in
-//            await productService.load(by: productId)
-//        }
-//
-//    }
-
 #endif
-
 }
-

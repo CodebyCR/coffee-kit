@@ -5,18 +5,24 @@
 //  Created by Christoph Rohde on 20.10.24.
 //
 
+//
+//  Coffee_LoverTests.swift
+//  Coffee LoverTests
+//
+//  Created by Christoph Rohde on 20.10.24.
+//
+
 import Foundation
-import XCTest
+import Testing
 import FoundationKit
 import AuthenticationKit
 import ProductKit
 import OrderKit
 import ImageKit
 
-final class Coffee_LoverTests: XCTestCase {
-    func testDecodingProduct() throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-
+struct Coffee_LoverTests {
+    @Test("Decoding a product from JSON")
+    func decodingProduct() throws {
         let ressource = """
         {
             "id": "e074867a-0c6a-49ff-87ca-b1ba5dae5236",
@@ -38,23 +44,24 @@ final class Coffee_LoverTests: XCTestCase {
         let data = Data(ressource.utf8)
         let product = try JSONDecoder().decode(Product.self, from: data)
 
-        XCTAssertEqual(product.id.uuidString, "e074867a-0c6a-49ff-87ca-b1ba5dae5236".uppercased())
+        #expect(product.id.uuidString == "e074867a-0c6a-49ff-87ca-b1ba5dae5236".uppercased())
     }
 
-    func testEncodingProduct() {
+    @Test("Encoding a product to JSON")
+    func encodingProduct() {
         let product = Product()
         guard let data = try? JSONEncoder().encode(product)
         else {
-            XCTFail("Encoding failed")
+            Issue.record("Encoding failed")
             return
         }
 
         guard let json = String(data: data, encoding: .utf8)
         else {
-            XCTFail("Decoding failed")
+            Issue.record("Decoding failed")
             return
         }
 
-        XCTAssertFalse(json.isEmpty)
+        #expect(!json.isEmpty)
     }
 }

@@ -6,17 +6,19 @@
 //
 
 import Foundation
-import XCTest
+import Testing
 import FoundationKit
 import AuthenticationKit
 import ProductKit
 import OrderKit
 import ImageKit
 
+@Suite("Websocket Connection Tests")
 @MainActor
-final class WebsocketConnectionTest: XCTestCase {
-    func testWebsocketConnectionOrderStatus() async throws {
-        try skipUnlessAPITestsEnabled()
+struct WebsocketConnectionTest {
+    
+    @Test("Websocket connection order status", .requiresAPI)
+    func websocketConnectionOrderStatus() async throws {
         let url = URL(string: "ws://127.0.0.1:8080/test/order/status/123")!
         print("Connecting to WebSocket at '\(url)'...")
         let connection = try WebsocketConnection(url: url)
@@ -50,7 +52,7 @@ final class WebsocketConnectionTest: XCTestCase {
         // falls der Server keinen Close-Frame sendet.
         connection.close()
 
-        XCTAssertTrue(shouldClose)
+        #expect(shouldClose)
         print("Test completed.")
     }
 }

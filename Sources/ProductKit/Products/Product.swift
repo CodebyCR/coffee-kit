@@ -39,7 +39,7 @@ nonisolated public extension Product {
 
 // MARK: - Computed Properties
 
-public extension Product {
+nonisolated public extension Product {
     func imageUrl(relativeTo imageURL: URL) -> URL {
         let newImageName = imageName.replacing(".png", with: ".heic")
         return imageURL / category / newImageName

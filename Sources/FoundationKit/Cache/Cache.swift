@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Cache.swift
 //  Coffee-Kit
 //
 //  Created by Christoph Rohde on 16.05.25.
@@ -8,34 +8,28 @@
 import Foundation
 import OSLog
 
+/// A thread-safe cache managed by an actor to ensure isolation through Structured Concurrency.
 public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Value: Sendable & CustomDebugStringConvertible> {
-    let log = Logger(subsystem: "Coffee-Kit", category: "Cache")
+    private let log = Logger(subsystem: "Coffee-Kit", category: "Cache")
     
     // MARK: - Properties
 
-    /// The  size of the cache in bytes.
-    /// The default is 50 MB.
+    /// The maximum size of the cache in bytes.
     private let memoryLimit: Int
 
     /// The current size of the cache in bytes.
     public private(set) var memoryUsage: Int
 
-    /// The cache dictionary.
-    private(set) var cache: [Key: Value]
+    /// The internal storage.
+    private var cache: [Key: Value]
 
     // MARK: - Initializer
 
-    public init() {
-        memoryLimit = 50 * 1024 * 1024 // 50 MB
-        cache = [:]
-        memoryUsage = MemoryLayout.size(ofValue: cache)
-    }
-
-    public init(memoryLimitInMB: Int) {
-        precondition(memoryLimitInMB >= 0, "memoryLimit can not be negative.")
+    public init(memoryLimitInMB: Int = 50) {
+        precondition(memoryLimitInMB >= 0, "memoryLimit cannot be negative.")
         self.memoryLimit = memoryLimitInMB * 1024 * 1024
-        cache = [:]
-        memoryUsage = MemoryLayout.size(ofValue: cache)
+        self.cache = [:]
+        self.memoryUsage = 0
     }
 
     // MARK: - Computed Properties
@@ -44,16 +38,9 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
         cache.count
     }
 
-    // MARK: - Static
+    // MARK: - Static Factory
 
-    /// This method creates a Cache instance and populates it with values fetched from the provided fetcher closure.
-    /// It uses a task group to fetch the values concurrently.
-    /// - Parameters:
-    ///   - keyList: An array of keys to fetch values for.
-    ///   - memoryLimit: The maximum memory limit for the cache. Default is 50 MB.
-    ///   - fetcher: An asynchronous closure that takes a key and returns a value.
-    ///   - Returns: A Cache instance populated with the fetched values.
-    ///   - Throws: An error if the fetching process fails.
+    /// Creates a Cache instance and populates it concurrently using a TaskGroup.
     @Sendable public static func create(
         by keyList: [Key],
         limitedTo memoryLimit: Int = 50,
@@ -61,6 +48,7 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
     ) async throws -> Cache<Key, Value> {
         let cache = Cache<Key, Value>(memoryLimitInMB: memoryLimit)
 
+        // Structured Concurrency: Using TaskGroup for concurrent fetching
         try await withThrowingTaskGroup(of: (Key, Value).self) { group in
             for key in keyList {
                 group.addTask {
@@ -77,7 +65,10 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
         return cache
     }
 
-    @Sendable public func fillUp(
+    // MARK: - Methods
+
+    /// Fills the cache with multiple items concurrently using a TaskGroup.
+    public func fillUp(
         by keyList: [Key],
         with fetcher: @Sendable @escaping (Key) async throws -> Value
     ) async throws {
@@ -95,62 +86,43 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
         }
     }
 
-    // MARK: - Methods
-
-    // init with id list, welche fetched mit TaskGroup
-
     public func fetch(key: Key, with fetcher: @escaping (Key) async throws -> Value) async throws -> Value {
         if let value = cache[key] {
-            //log.info("Cached Item found for Key: \(key.debugDescription, privacy: .public)")
             return value
         }
 
         let value = try await fetcher(key)
-
-        if !maxCacheSizeReached(with: MemoryLayout.size(ofValue: value)) {
-            //log.info("Max Cache size not reached. Adding to cache.")
-            self[key] = value
-        }
-
+        self.set(key: key, value: value)
         return value
     }
 
-    private func add(key: Key, value: Value) {
-        self[key] = value
-    }
-
     public func set(key: Key, value: Value) {
-        //log.info("Set into cache with key: \(key.debugDescription, privacy: .public) and value: \(value.debugDescription, privacy: .public)" )
-        
         if let oldValue = cache[key] {
             memoryUsage -= MemoryLayout.size(ofValue: oldValue)
         }
 
-        if maxCacheSizeReached(with: MemoryLayout.size(ofValue: value)) {
-            //log.info("Cache size limit reached. Cannot add new value.")
+        let valueSize = MemoryLayout.size(ofValue: value)
+        if (memoryUsage + valueSize) > memoryLimit {
             return
         }
 
-        memoryUsage += MemoryLayout.size(ofValue: value)
+        memoryUsage += valueSize
         cache[key] = value
     }
 
     public func remove(key: Key) {
-        guard let value = cache[key]
-        else {
-            return
-        }
+        guard let value = cache[key] else { return }
         memoryUsage -= MemoryLayout.size(ofValue: value)
         cache.removeValue(forKey: key)
     }
 
     public func get(key: Key) -> Value? {
-        self[key]
+        cache[key]
     }
 
     public func clear() {
         cache.removeAll()
-        memoryUsage = MemoryLayout.size(ofValue: cache)
+        memoryUsage = 0
     }
 
     public func contains(key: Key) -> Bool {
@@ -169,19 +141,10 @@ public actor Cache<Key: Hashable & Sendable & CustomDebugStringConvertible, Valu
         }
         set {
             if let newValue = newValue {
-                memoryUsage += MemoryLayout.size(ofValue: newValue)
-                cache[key] = newValue
+                self.set(key: key, value: newValue)
             } else {
-                cache.removeValue(forKey: key)
+                self.remove(key: key)
             }
         }
-    }
-
-    // MARK: - Memory Management
-
-    private func maxCacheSizeReached(with valueSize: Int) -> Bool {
-        let newMemoryUsage = memoryUsage + valueSize
-//        print("New memory usage: \(newMemoryUsage) bytes")
-        return newMemoryUsage > memoryLimit
     }
 }
