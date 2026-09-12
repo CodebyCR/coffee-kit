@@ -23,3 +23,7 @@ nonisolated public enum OrderStatus: String, CaseIterable, Identifiable {
     }
 
 }
+
+// MARK: - Sendable
+
+nonisolated extension OrderStatus: Sendable {}

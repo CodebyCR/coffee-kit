@@ -20,3 +20,7 @@ nonisolated public enum PaymentStatus: String, CaseIterable, Identifiable {
         return allCases.first { $0.rawValue == name } ?? .unknown
     }
 }
+
+// MARK: - Sendable
+
+nonisolated extension PaymentStatus: Sendable {}
